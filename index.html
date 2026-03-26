@@ -2,72 +2,308 @@
 <html>
 <head>
   <title>CBT Exam</title>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      background: #f4f6f9;
+    }
+
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .container {
+      padding: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      overflow-x: auto;
+      background: #34495e;
+    }
+
+    .tab {
+      padding: 10px;
+      color: white;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .active-tab {
+      background: #1abc9c;
+    }
+
+    .question-box {
+      background: white;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    .option {
+      background: #ecf0f1;
+      padding: 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .selected {
+      background: #1abc9c;
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .grid button {
+      padding: 10px;
+      border: none;
+      background: #bdc3c7;
+      cursor: pointer;
+    }
+
+    .answered {
+      background: #27ae60 !important;
+      color: white;
+    }
+
+    .timer {
+      font-weight: bold;
+      color: yellow;
+    }
+
+    .btn {
+      background: #e74c3c;
+      color: white;
+      padding: 10px;
+      border: none;
+      margin-top: 10px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .start-box {
+      padding: 20px;
+      text-align: center;
+    }
+
+    input {
+      padding: 10px;
+      width: 80%;
+      margin-bottom: 10px;
+    }
+
+    select {
+      padding: 10px;
+      width: 80%;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>CBT Exam</h2>
+<header>
+  <div>CBT Exam</div>
+  <div class="timer" id="timer">02:00:00</div>
+</header>
 
-<input type="text" id="name" placeholder="Enter your name"><br><br>
-<button onclick="startExam()">Start Exam</button>
+<div id="startPage" class="start-box">
+  <h2>Start Exam</h2>
+  <input id="name" placeholder="Enter Name"><br>
 
-<div id="exam"></div>
+  <select id="subjects" multiple>
+    <option>Mathematics</option>
+    <option>Physics</option>
+    <option>Chemistry</option>
+    <option>Biology</option>
+  </select>
+
+  <p>(Use of English is compulsory)</p>
+
+  <button onclick="startExam()">Start</button>
+</div>
+
+<div id="examPage" style="display:none">
+  <div class="tabs" id="tabs"></div>
+
+  <div class="container">
+    <div id="questionBox" class="question-box"></div>
+
+    <div class="grid" id="grid"></div>
+
+    <button class="btn" onclick="submitExam()">Submit Exam</button>
+  </div>
+1</div>
 
 <script>
 const BASE_URL = "https://cbt-backend-mgqe.onrender.com";
 
+let examId = "";
 let questions = [];
-let current = 0;
-let score = 0;
+let currentIndex = 0;
+let currentSubject = "";
+let answers = {};
+let timerInterval;
 
+// START EXAM
 async function startExam() {
-  const res = await fetch(BASE_URL + "/questions");
-  questions = await res.json();
-
-  questions = questions.sort(() => Math.random() - 0.5);
-
-  showQuestion();
-}
-
-function showQuestion() {
-  if (current >= questions.length) {
-    submitResult();
-    return;
-  }
-
-  const q = questions[current];
-
-  let options = [...q.options].sort(() => Math.random() - 0.5);
-
-  document.getElementById("exam").innerHTML = `
-    <h3>Q${current + 1}: ${q.question}</h3>
-    ${options.map(opt => `
-      <button onclick="checkAnswer('${opt}', '${q.answer}')">${opt}</button><br><br>
-    `).join("")}
-  `;
-
-  MathJax.typeset();
-}
-
-function checkAnswer(selected, correct) {
-  if (selected === correct) score++;
-  current++;
-  showQuestion();
-}
-
-async function submitResult() {
   const name = document.getElementById("name").value;
+  const selected = Array.from(document.getElementById("subjects").selectedOptions).map(o => o.value);
 
-  await fetch(BASE_URL + "/submit", {
+  selected.push("Use of English");
+
+  const res1 = await fetch(BASE_URL + "/start-exam", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ name, score })
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, subjects: selected })
   });
 
-  document.getElementById("exam").innerHTML = `
-    <h2>Exam Completed</h2>
-    <p>Score: ${score}/${questions.length}</p>
-  `;
+  const data1 = await res1.json();
+  examId = data1.examId;
+
+  const res2 = await fetch(BASE_URL + "/generate-questions", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ subjects: selected })
+  });
+
+  questions = await res2.json();
+
+  setupTabs(selected);
+
+  document.getElementById("startPage").style.display = "none";
+  document.getElementById("examPage").style.display = "block";
+
+  startTimer();
+  loadQuestion(0);
+}
+
+// SUBJECT TABS
+function setupTabs(subjects) {
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = "";
+
+  subjects.forEach(sub => {
+    const div = document.createElement("div");
+    div.innerText = sub;
+    div.className = "tab";
+    div.onclick = () => switchSubject(sub);
+    tabs.appendChild(div);
+  });
+
+  switchSubject(subjects[0]);
+}
+
+function switchSubject(subject) {
+  currentSubject = subject;
+  currentIndex = 0;
+
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.remove("active-tab");
+    if (t.innerText === subject) t.classList.add("active-tab");
+  });
+
+  loadQuestion(0);
+}
+
+// LOAD QUESTION
+function loadQuestion(index) {
+  const filtered = questions.filter(q => q.subject === currentSubject);
+  const q = filtered[index];
+
+  currentIndex = index;
+
+  let html = `<h3>${index+1}. ${q.question}</h3>`;
+
+  q.options.forEach(opt => {
+    const selected = answers[q._id] === opt ? "selected" : "";
+    html += `<div class="option ${selected}" onclick="selectAnswer('${q._id}', '${opt}')">${opt}</div>`;
+  });
+
+  document.getElementById("questionBox").innerHTML = html;
+
+  buildGrid(filtered);
+}
+
+// GRID NAVIGATION
+function buildGrid(list) {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  list.forEach((q, i) => {
+    const btn = document.createElement("button");
+    btn.innerText = i + 1;
+    if (answers[q._id]) btn.classList.add("answered");
+
+    btn.onclick = () => loadQuestion(i);
+    grid.appendChild(btn);
+  });
+}
+
+// AUTO SAVE
+async function selectAnswer(id, option) {
+  answers[id] = option;
+
+  await fetch(BASE_URL + "/save-answer", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      examId,
+      questionId: id,
+      selected: option
+    })
+  });
+
+  loadQuestion(currentIndex);
+}
+
+// TIMER (2 HOURS)
+function startTimer() {
+  let time = 2 * 60 * 60;
+
+  timerInterval = setInterval(() => {
+    time--;
+
+    let h = Math.floor(time / 3600);
+    let m = Math.floor((time % 3600)/60);
+    let s = time % 60;
+
+    document.getElementById("timer").innerText =
+      `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+    if (time <= 0) {
+      clearInterval(timerInterval);
+      submitExam();
+    }
+  }, 1000);
+}
+
+// SUBMIT
+async function submitExam() {
+  clearInterval(timerInterval);
+
+  const res = await fetch(BASE_URL + "/submit-exam", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ examId })
+  });
+
+  const data = await res.json();
+
+  alert("Score: " + data.score + " / 400");
 }
 </script>
 
