@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CBT Exam</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<h2>CBT Exam</h2>
+
+<input type="text" id="name" placeholder="Enter your name"><br><br>
+<button onclick="startExam()">Start Exam</button>
+
+<div id="exam"></div>
+
+<script>
+const BASE_URL = "https://cbt-backend-mgqe.onrender.com";
+
+let questions = [];
+let current = 0;
+let score = 0;
+
+async function startExam() {
+  const res = await fetch(BASE_URL + "/questions");
+  questions = await res.json();
+
+  questions = questions.sort(() => Math.random() - 0.5);
+
+  showQuestion();
+}
+
+function showQuestion() {
+  if (current >= questions.length) {
+    submitResult();
+    return;
+  }
+
+  const q = questions[current];
+
+  let options = [...q.options].sort(() => Math.random() - 0.5);
+
+  document.getElementById("exam").innerHTML = `
+    <h3>Q${current + 1}: ${q.question}</h3>
+    ${options.map(opt => `
+      <button onclick="checkAnswer('${opt}', '${q.answer}')">${opt}</button><br><br>
+    `).join("")}
+  `;
+
+  MathJax.typeset();
+}
+
+function checkAnswer(selected, correct) {
+  if (selected === correct) score++;
+  current++;
+  showQuestion();
+}
+
+async function submitResult() {
+  const name = document.getElementById("name").value;
+
+  await fetch(BASE_URL + "/submit", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ name, score })
+  });
+
+  document.getElementById("exam").innerHTML = `
+    <h2>Exam Completed</h2>
+    <p>Score: ${score}/${questions.length}</p>
+  `;
+}
+</script>
+
+</body>
+</html>
