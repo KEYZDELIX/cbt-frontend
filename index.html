@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SST JAMB MOCK 2026</title>
+    <title>STT JAMB MOCK 2026</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
@@ -39,7 +41,8 @@
     <div class="exam-layout">
         <main>
             <div class="question-card" id="questionArea">
-                </div>
+                <p>Loading questions...</p>
+            </div>
             <div style="margin-top: 20px; display: flex; justify-content: space-between;">
                 <button class="btn-main" style="width: 120px;" onclick="prevQuestion()">Previous</button>
                 <button class="btn-main" style="width: 120px;" onclick="nextQuestion()">Next</button>
@@ -50,7 +53,7 @@
             <h4>Question Palette</h4>
             <div class="q-grid" id="questionGrid"></div>
             <hr>
-            <button class="btn-main" style="background: var(--accent);" onclick="confirmSubmit()">SUBMIT EXAM</button>
+            <button class="btn-main" style="background: #e74c3c;" onclick="confirmSubmit()">SUBMIT EXAM</button>
         </aside>
     </div>
 </div>
@@ -58,7 +61,7 @@
 <div id="resultPage" class="hidden">
     <div class="result-container">
         <h2>Examination Result</h2>
-        <div id="scoreCircle" style="font-size: 3rem; color: var(--secondary); margin: 20px 0;"></div>
+        <div id="scoreCircle" style="font-size: 3rem; color: #1abc9c; margin: 20px 0;"></div>
         <table id="resultTable">
             <thead>
                 <tr><th>Subject</th><th>Score</th></tr>
@@ -70,72 +73,72 @@
 </div>
 
 <script>
-    const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; // Update to your Render URL
+    const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; 
+    
     let state = {
         examId: null,
         userId: null,
-        allQuestions: [], // Organized by subject
+        allQuestions: [], 
         currentSubIndex: 0,
         currentQIndex: 0,
-        answers: {}, // { questionId: selectedKey }
-        timeLeft: 120 * 60
+        answers: {}, 
+        timeLeft: 120 * 60,
+        timerInterval: null
     };
-async function handleLogin() {
-    const regNumber = document.getElementById('regNumber').value;
-    const password = document.getElementById('password').value;
-    const errorEl = document.getElementById('loginError');
-    const btn = document.getElementById('loginBtn');
 
-    if(!regNumber || !password) return alert("Please enter both Reg Number and Password");
+    async function handleLogin() {
+        const regNumber = document.getElementById('regNumber').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const errorEl = document.getElementById('loginError');
+        const btn = document.getElementById('loginBtn');
 
-    btn.innerText = "Authenticating...";
-    btn.disabled = true;
+        if(!regNumber || !password) return alert("Please enter both Reg Number and Password");
 
-    try {
-        const res = await fetch(`${BASE_URL}/login`, {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({ regNumber, password })
-        });
+        errorEl.innerText = "";
+        btn.innerText = "Authenticating...";
+        btn.disabled = true;
 
-        const data = await res.json();
+        try {
+            const res = await fetch(`${BASE_URL}/login`, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({ regNumber, password })
+            });
 
-        if (res.status !== 200) {
-            errorEl.innerText = data.message;
+            const data = await res.json();
+
+            if (!res.ok) {
+                errorEl.innerText = data.message || "Login failed";
+                btn.innerText = "LOGIN TO START EXAM";
+                btn.disabled = false;
+                return;
+            }
+
+            // SUCCESS: Set state
+            state.examId = data.examId;
+            state.userId = data.userId;
+
+            // Fetch Questions
+            const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
+            if (!qRes.ok) throw new Error("Could not load questions.");
+            state.allQuestions = await qRes.json();
+
+            // UI Transition
+            document.getElementById('userDisplayName').innerText = `${data.firstName} ${data.lastName} (${data.regNumber})`;
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('examPage').classList.remove('hidden');
+            
+            renderTabs();
+            renderQuestion();
+            startTimer();
+
+        } catch (err) {
+            console.error(err);
+            errorEl.innerText = "Connection error. Is the server running?";
             btn.innerText = "LOGIN TO START EXAM";
             btn.disabled = false;
-            return;
         }
-
-// ... inside handleLogin() after const data = await res.json();
-
-if (res.ok) {
-    // 1. Store IDs in the global state
-    state.examId = data.examId;
-    state.userId = data.userId;
-
-    // 2. Update the UI Header with the retrieved data
-    // Use data.firstName and data.regNumber specifically
-    document.getElementById('userDisplayName').innerText = 
-        `${data.firstName} ${data.lastName} (${data.regNumber})`;
-
-    // 3. Proceed to fetch questions
-    const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
-    state.allQuestions = await qRes.json();
-
-    // 4. Switch Screens
-    document.getElementById('loginPage').classList.add('hidden');
-    document.getElementById('examPage').classList.remove('hidden');
-    
-    renderTabs();
-    renderQuestion();
-    startTimer();
-} else {
-    // Handle error if data.message is undefined
-    errorEl.innerText = data.message || "Login failed";
-}
-}
-    
+    }
 
     function renderTabs() {
         const container = document.getElementById('subjectTabs');
@@ -155,13 +158,22 @@ if (res.ok) {
 
     function renderQuestion() {
         const subjectData = state.allQuestions[state.currentSubIndex];
+        if (!subjectData || !subjectData.questions.length) {
+            document.getElementById('questionArea').innerHTML = "No questions found for this subject.";
+            return;
+        }
+
         const q = subjectData.questions[state.currentQIndex];
         const questionArea = document.getElementById('questionArea');
 
         let html = `
             <small>Subject: ${subjectData.subject} | Question ${state.currentQIndex + 1}</small>
-            <p style="font-size: 1.2rem; margin: 20px 0;">${q.questionText}</p>
+            <div style="font-size: 1.2rem; margin: 20px 0;">${q.questionText}</div>
         `;
+
+        if(q.questionImage) {
+            html += `<img src="${q.questionImage}" style="max-width:100%; height:auto; margin-bottom:15px; border-radius:5px;">`;
+        }
 
         q.options.forEach(opt => {
             const isSelected = state.answers[q._id] === opt.key;
@@ -169,12 +181,16 @@ if (res.ok) {
                 <div class="option ${isSelected ? 'selected' : ''}" onclick="saveAnswer('${q._id}', '${opt.key}')">
                     <span class="opt-key">${opt.key}</span>
                     <span>${opt.value}</span>
+                    ${opt.optionImage ? `<br><img src="${opt.optionImage}" style="max-height:100px; margin-top:5px;">` : ''}
                 </div>
             `;
         });
 
         questionArea.innerHTML = html;
         renderGrid();
+        
+        // Trigger MathJax to render any LaTeX
+        if (window.MathJax) MathJax.typesetPromise();
     }
 
     function renderGrid() {
@@ -191,19 +207,23 @@ if (res.ok) {
         renderQuestion();
         
         // Silent background save
-        fetch(`${BASE_URL}/save-answer`, {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({ examId: state.examId, questionId: qId, selectedOptionKey: key })
-        });
+        try {
+            await fetch(`${BASE_URL}/save-answer`, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({ examId: state.examId, questionId: qId, selectedOptionKey: key })
+            });
+        } catch (e) { console.error("Auto-save failed", e); }
     }
 
     function jumpTo(i) { state.currentQIndex = i; renderQuestion(); }
+    
     function nextQuestion() { 
         if(state.currentQIndex < state.allQuestions[state.currentSubIndex].questions.length - 1) {
             state.currentQIndex++; renderQuestion();
         }
     }
+    
     function prevQuestion() {
         if(state.currentQIndex > 0) {
             state.currentQIndex--; renderQuestion();
@@ -212,28 +232,40 @@ if (res.ok) {
 
     function startTimer() {
         const timerEl = document.getElementById('timer');
-        const interval = setInterval(() => {
+        state.timerInterval = setInterval(() => {
             state.timeLeft--;
+            if(state.timeLeft <= 0) {
+                clearInterval(state.timerInterval);
+                autoSubmit();
+            }
             let h = Math.floor(state.timeLeft / 3600);
             let m = Math.floor((state.timeLeft % 3600) / 60);
             let s = state.timeLeft % 60;
             timerEl.innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            
-            if(state.timeLeft <= 0) { clearInterval(interval); confirmSubmit(); }
         }, 1000);
     }
 
     async function confirmSubmit() {
-        if(!confirm("Are you sure you want to submit?")) return;
-        
-        const res = await fetch(`${BASE_URL}/submit-exam`, {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({ examId: state.examId })
-        });
-        const result = await res.json();
-        
-        showResults(result);
+        if(!confirm("Are you sure you want to end the exam?")) return;
+        submitProcess();
+    }
+
+    async function autoSubmit() {
+        alert("Time is up! Your exam is being submitted automatically.");
+        submitProcess();
+    }
+
+    async function submitProcess() {
+        clearInterval(state.timerInterval);
+        try {
+            const res = await fetch(`${BASE_URL}/submit-exam`, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({ examId: state.examId })
+            });
+            const result = await res.json();
+            showResults(result);
+        } catch (e) { alert("Submission failed. Please check your internet."); }
     }
 
     function showResults(data) {
@@ -245,7 +277,7 @@ if (res.ok) {
         body.innerHTML = data.subjectResults.map(r => `
             <tr>
                 <td>${r.subjectName}</td>
-                <td>${r.weightedScore} / 100 <small>(${r.correctCount} correct)</small></td>
+                <td>${r.weightedScore} / 100 <br><small>(${r.correctCount} correct)</small></td>
             </tr>
         `).join('');
     }
