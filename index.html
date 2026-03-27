@@ -1,311 +1,249 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CBT Exam</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    body {
-      font-family: Arial;
-      margin: 0;
-      background: #f4f6f9;
-    }
-
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .container {
-      padding: 10px;
-    }
-
-    .tabs {
-      display: flex;
-      overflow-x: auto;
-      background: #34495e;
-    }
-
-    .tab {
-      padding: 10px;
-      color: white;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .active-tab {
-      background: #1abc9c;
-    }
-
-    .question-box {
-      background: white;
-      padding: 15px;
-      margin-top: 10px;
-      border-radius: 5px;
-    }
-
-    .option {
-      background: #ecf0f1;
-      padding: 10px;
-      margin: 5px 0;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .selected {
-      background: #1abc9c;
-      color: white;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
-      margin-top: 10px;
-    }
-
-    .grid button {
-      padding: 10px;
-      border: none;
-      background: #bdc3c7;
-      cursor: pointer;
-    }
-
-    .answered {
-      background: #27ae60 !important;
-      color: white;
-    }
-
-    .timer {
-      font-weight: bold;
-      color: yellow;
-    }
-
-    .btn {
-      background: #e74c3c;
-      color: white;
-      padding: 10px;
-      border: none;
-      margin-top: 10px;
-      width: 100%;
-      cursor: pointer;
-    }
-
-    .start-box {
-      padding: 20px;
-      text-align: center;
-    }
-
-    input {
-      padding: 10px;
-      width: 80%;
-      margin-bottom: 10px;
-    }
-
-    select {
-      padding: 10px;
-      width: 80%;
-      margin-bottom: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SST JAMB MOCK 2026</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <header>
-  <div>CBT Exam</div>
-  <div class="timer" id="timer">02:00:00</div>
+    <div class="logo">STT <strong>JAMB</strong> MOCK (1) 2026</div>
+    <div class="timer-box" id="timer">02:00:00</div>
+    <div id="userDisplayName" style="font-size: 0.9rem;"></div>
 </header>
 
-<div id="startPage" class="start-box">
-  <h2>Start Exam</h2>
-  <input id="name" placeholder="Enter Name"><br>
-
-  <select id="subjects" multiple>
-    <option>Mathematics</option>
-    <option>Physics</option>
-    <option>Chemistry</option>
-    <option>Biology</option>
-  </select>
-
-  <p>(Use of English is compulsory)</p>
-
-  <button onclick="startExam()">Start</button>
+<div id="loginPage" class="auth-container">
+    <div style="margin-bottom: 20px;">
+        <img src="https://via.placeholder.com/80" alt="Logo" style="border-radius: 50%;">
+        <h2>JAMB Portal Login</h2>
+    </div>
+    <div style="text-align: left;">
+        <label>Registration Number</label>
+        <input type="text" id="regNumber" placeholder="e.g. STT2026100555AB">
+        
+        <label>Password / PIN</label>
+        <input type="password" id="password" placeholder="••••••••">
+    </div>
+    <button class="btn-main" style="margin-top: 20px;" id="loginBtn" onclick="handleLogin()">
+        LOGIN TO START EXAM
+    </button>
+    
+    <p id="loginError" style="color: var(--accent); font-size: 0.8rem; margin-top: 10px;"></p>
 </div>
 
-<div id="examPage" style="display:none">
-  <div class="tabs" id="tabs"></div>
+<div id="examPage" class="hidden">
+    <div class="subject-tabs" id="subjectTabs"></div>
+    
+    <div class="exam-layout">
+        <main>
+            <div class="question-card" id="questionArea">
+                </div>
+            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <button class="btn-main" style="width: 120px;" onclick="prevQuestion()">Previous</button>
+                <button class="btn-main" style="width: 120px;" onclick="nextQuestion()">Next</button>
+            </div>
+        </main>
 
-  <div class="container">
-    <div id="questionBox" class="question-box"></div>
+        <aside class="nav-panel">
+            <h4>Question Palette</h4>
+            <div class="q-grid" id="questionGrid"></div>
+            <hr>
+            <button class="btn-main" style="background: var(--accent);" onclick="confirmSubmit()">SUBMIT EXAM</button>
+        </aside>
+    </div>
+</div>
 
-    <div class="grid" id="grid"></div>
-
-    <button class="btn" onclick="submitExam()">Submit Exam</button>
-  </div>
-1</div>
+<div id="resultPage" class="hidden">
+    <div class="result-container">
+        <h2>Examination Result</h2>
+        <div id="scoreCircle" style="font-size: 3rem; color: var(--secondary); margin: 20px 0;"></div>
+        <table id="resultTable">
+            <thead>
+                <tr><th>Subject</th><th>Score</th></tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+        </table>
+        <button class="btn-main" onclick="location.reload()">Take Another Mock</button>
+    </div>
+</div>
 
 <script>
-const BASE_URL = "https://cbt-backend-mgqe.onrender.com";
+    const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; // Update to your Render URL
+    let state = {
+        examId: null,
+        userId: null,
+        allQuestions: [], // Organized by subject
+        currentSubIndex: 0,
+        currentQIndex: 0,
+        answers: {}, // { questionId: selectedKey }
+        timeLeft: 120 * 60
+    };
+async function handleLogin() {
+    const regNumber = document.getElementById('regNumber').value;
+    const password = document.getElementById('password').value;
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
 
-let examId = "";
-let questions = [];
-let currentIndex = 0;
-let currentSubject = "";
-let answers = {};
-let timerInterval;
+    if(!regNumber || !password) return alert("Please enter both Reg Number and Password");
 
-// START EXAM
-async function startExam() {
-  const name = document.getElementById("name").value;
-  const selected = Array.from(document.getElementById("subjects").selectedOptions).map(o => o.value);
+    btn.innerText = "Authenticating...";
+    btn.disabled = true;
 
-  selected.push("Use of English");
+    try {
+        const res = await fetch(`${BASE_URL}/login`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ regNumber, password })
+        });
 
-  const res1 = await fetch(BASE_URL + "/start-exam", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ name, subjects: selected })
-  });
+        const data = await res.json();
 
-  const data1 = await res1.json();
-  examId = data1.examId;
+        if (res.status !== 200) {
+            errorEl.innerText = data.message;
+            btn.innerText = "LOGIN TO START EXAM";
+            btn.disabled = false;
+            return;
+        }
 
-  const res2 = await fetch(BASE_URL + "/generate-questions", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ subjects: selected })
-  });
+        // Successfully Logged In
+        state.examId = data.examId;
+        state.userId = data.userId;
 
-  questions = await res2.json();
+        // Fetch Questions for this user's specific subject combination
+        const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
+        state.allQuestions = await qRes.json();
 
-  setupTabs(selected);
+        // UI Transition
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('examPage').classList.remove('hidden');
+        document.getElementById('userDisplayName').innerText = 
+            `${data.firstName} ${data.lastName} (${regNumber.toUpperCase()})`;
+        
+        renderTabs();
+        renderQuestion();
+        startTimer();
 
-  document.getElementById("startPage").style.display = "none";
-  document.getElementById("examPage").style.display = "block";
-
-  startTimer();
-  loadQuestion(0);
-}
-
-// SUBJECT TABS
-function setupTabs(subjects) {
-  const tabs = document.getElementById("tabs");
-  tabs.innerHTML = "";
-
-  subjects.forEach(sub => {
-    const div = document.createElement("div");
-    div.innerText = sub;
-    div.className = "tab";
-    div.onclick = () => switchSubject(sub);
-    tabs.appendChild(div);
-  });
-
-  switchSubject(subjects[0]);
-}
-
-function switchSubject(subject) {
-  currentSubject = subject;
-  currentIndex = 0;
-
-  document.querySelectorAll(".tab").forEach(t => {
-    t.classList.remove("active-tab");
-    if (t.innerText === subject) t.classList.add("active-tab");
-  });
-
-  loadQuestion(0);
-}
-
-// LOAD QUESTION
-function loadQuestion(index) {
-  const filtered = questions.filter(q => q.subject === currentSubject);
-  const q = filtered[index];
-
-  currentIndex = index;
-
-  let html = `<h3>${index+1}. ${q.question}</h3>`;
-
-  q.options.forEach(opt => {
-    const selected = answers[q._id] === opt ? "selected" : "";
-    html += `<div class="option ${selected}" onclick="selectAnswer('${q._id}', '${opt}')">${opt}</div>`;
-  });
-
-  document.getElementById("questionBox").innerHTML = html;
-
-  buildGrid(filtered);
-}
-
-// GRID NAVIGATION
-function buildGrid(list) {
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-
-  list.forEach((q, i) => {
-    const btn = document.createElement("button");
-    btn.innerText = i + 1;
-    if (answers[q._id]) btn.classList.add("answered");
-
-    btn.onclick = () => loadQuestion(i);
-    grid.appendChild(btn);
-  });
-}
-
-// AUTO SAVE
-async function selectAnswer(id, option) {
-  answers[id] = option;
-
-  await fetch(BASE_URL + "/save-answer", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({
-      examId,
-      questionId: id,
-      selected: option
-    })
-  });
-
-  loadQuestion(currentIndex);
-}
-
-// TIMER (2 HOURS)
-function startTimer() {
-  let time = 2 * 60 * 60;
-
-  timerInterval = setInterval(() => {
-    time--;
-
-    let h = Math.floor(time / 3600);
-    let m = Math.floor((time % 3600)/60);
-    let s = time % 60;
-
-    document.getElementById("timer").innerText =
-      `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-
-    if (time <= 0) {
-      clearInterval(timerInterval);
-      submitExam();
+    } catch (err) {
+        errorEl.innerText = "Server connection failed. Please try again.";
+        btn.disabled = false;
     }
-  }, 1000);
 }
+    
 
-// SUBMIT
-async function submitExam() {
-  clearInterval(timerInterval);
+    function renderTabs() {
+        const container = document.getElementById('subjectTabs');
+        container.innerHTML = state.allQuestions.map((item, idx) => `
+            <div class="tab ${idx === state.currentSubIndex ? 'active-tab' : ''}" onclick="switchSubject(${idx})">
+                ${item.subject}
+            </div>
+        `).join('');
+    }
 
-  const res = await fetch(BASE_URL + "/submit-exam", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ examId })
-  });
+    function switchSubject(idx) {
+        state.currentSubIndex = idx;
+        state.currentQIndex = 0;
+        renderTabs();
+        renderQuestion();
+    }
 
-  const data = await res.json();
+    function renderQuestion() {
+        const subjectData = state.allQuestions[state.currentSubIndex];
+        const q = subjectData.questions[state.currentQIndex];
+        const questionArea = document.getElementById('questionArea');
 
-  alert("Score: " + data.score + " / 400");
-}
+        let html = `
+            <small>Subject: ${subjectData.subject} | Question ${state.currentQIndex + 1}</small>
+            <p style="font-size: 1.2rem; margin: 20px 0;">${q.questionText}</p>
+        `;
+
+        q.options.forEach(opt => {
+            const isSelected = state.answers[q._id] === opt.key;
+            html += `
+                <div class="option ${isSelected ? 'selected' : ''}" onclick="saveAnswer('${q._id}', '${opt.key}')">
+                    <span class="opt-key">${opt.key}</span>
+                    <span>${opt.value}</span>
+                </div>
+            `;
+        });
+
+        questionArea.innerHTML = html;
+        renderGrid();
+    }
+
+    function renderGrid() {
+        const questions = state.allQuestions[state.currentSubIndex].questions;
+        const grid = document.getElementById('questionGrid');
+        grid.innerHTML = questions.map((q, i) => `
+            <div class="q-circle ${state.answers[q._id] ? 'answered' : ''} ${i === state.currentQIndex ? 'current' : ''}" 
+                 onclick="jumpTo(${i})">${i + 1}</div>
+        `).join('');
+    }
+
+    async function saveAnswer(qId, key) {
+        state.answers[qId] = key;
+        renderQuestion();
+        
+        // Silent background save
+        fetch(`${BASE_URL}/save-answer`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ examId: state.examId, questionId: qId, selectedOptionKey: key })
+        });
+    }
+
+    function jumpTo(i) { state.currentQIndex = i; renderQuestion(); }
+    function nextQuestion() { 
+        if(state.currentQIndex < state.allQuestions[state.currentSubIndex].questions.length - 1) {
+            state.currentQIndex++; renderQuestion();
+        }
+    }
+    function prevQuestion() {
+        if(state.currentQIndex > 0) {
+            state.currentQIndex--; renderQuestion();
+        }
+    }
+
+    function startTimer() {
+        const timerEl = document.getElementById('timer');
+        const interval = setInterval(() => {
+            state.timeLeft--;
+            let h = Math.floor(state.timeLeft / 3600);
+            let m = Math.floor((state.timeLeft % 3600) / 60);
+            let s = state.timeLeft % 60;
+            timerEl.innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            
+            if(state.timeLeft <= 0) { clearInterval(interval); confirmSubmit(); }
+        }, 1000);
+    }
+
+    async function confirmSubmit() {
+        if(!confirm("Are you sure you want to submit?")) return;
+        
+        const res = await fetch(`${BASE_URL}/submit-exam`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ examId: state.examId })
+        });
+        const result = await res.json();
+        
+        showResults(result);
+    }
+
+    function showResults(data) {
+        document.getElementById('examPage').classList.add('hidden');
+        document.getElementById('resultPage').classList.remove('hidden');
+        document.getElementById('scoreCircle').innerText = `${data.aggregateScore} / 400`;
+        
+        const body = document.getElementById('resultBody');
+        body.innerHTML = data.subjectResults.map(r => `
+            <tr>
+                <td>${r.subjectName}</td>
+                <td>${r.weightedScore} / 100 <small>(${r.correctCount} correct)</small></td>
+            </tr>
+        `).join('');
+    }
 </script>
-
 </body>
 </html>
