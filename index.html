@@ -17,11 +17,11 @@
 <div id="loginPage" class="auth-container">
     <div style="margin-bottom: 20px;">
         <img src="https://via.placeholder.com/80" alt="Logo" style="border-radius: 50%;">
-        <h2>JAMB Portal Login</h2>
+        <h2>STT Portal Login</h2>
     </div>
     <div style="text-align: left;">
         <label>Registration Number</label>
-        <input type="text" id="regNumber" placeholder="e.g. STT2026100555AB">
+        <input type="text" id="regNumber" placeholder="e.g. STT203455AB">
         
         <label>Password / PIN</label>
         <input type="password" id="password" placeholder="••••••••">
@@ -107,28 +107,33 @@ async function handleLogin() {
             return;
         }
 
-        // Successfully Logged In
-        state.examId = data.examId;
-        state.userId = data.userId;
+// ... inside handleLogin() after const data = await res.json();
 
-        // Fetch Questions for this user's specific subject combination
-        const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
-        state.allQuestions = await qRes.json();
+if (res.ok) {
+    // 1. Store IDs in the global state
+    state.examId = data.examId;
+    state.userId = data.userId;
 
-        // UI Transition
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('examPage').classList.remove('hidden');
-        document.getElementById('userDisplayName').innerText = 
-            `${data.firstName} ${data.lastName} (${regNumber.toUpperCase()})`;
-        
-        renderTabs();
-        renderQuestion();
-        startTimer();
+    // 2. Update the UI Header with the retrieved data
+    // Use data.firstName and data.regNumber specifically
+    document.getElementById('userDisplayName').innerText = 
+        `${data.firstName} ${data.lastName} (${data.regNumber})`;
 
-    } catch (err) {
-        errorEl.innerText = "Server connection failed. Please try again.";
-        btn.disabled = false;
-    }
+    // 3. Proceed to fetch questions
+    const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
+    state.allQuestions = await qRes.json();
+
+    // 4. Switch Screens
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('examPage').classList.remove('hidden');
+    
+    renderTabs();
+    renderQuestion();
+    startTimer();
+} else {
+    // Handle error if data.message is undefined
+    errorEl.innerText = data.message || "Login failed";
+}
 }
     
 
