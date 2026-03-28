@@ -35,6 +35,19 @@
     <p id="loginError" style="color: var(--accent); font-size: 0.8rem; margin-top: 10px;"></p>
 </div>
 
+<div id="dashboardPage" class="hidden auth-container">
+    <div class="card">
+        <h3>Welcome, <span id="dashName"></span></h3>
+        <p><strong>Reg No:</strong> <span id="dashReg"></span></p>
+        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
+            <p><strong>Available Exam:</strong> <span id="examName"></span></p>
+            <p><strong>Duration:</strong> <span id="examDur"></span> Minutes</p>
+            <p><strong>Subjects:</strong> <span id="examSubs"></span></p>
+        </div>
+        <button class="btn-main" id="startExamBtn" onclick="initiateExam()">START EXAMINATION NOW</button>
+    </div>
+</div>
+
 <div id="examPage" class="hidden">
     <div class="subject-tabs" id="subjectTabs"></div>
     
@@ -86,7 +99,7 @@
         timerInterval: null
     };
 
-    async function handleLogin() {
+    /*async function handleLogin() {
         const regNumber = document.getElementById('regNumber').value.trim();
         const password = document.getElementById('password').value.trim();
         const errorEl = document.getElementById('loginError');
@@ -138,6 +151,53 @@
             btn.innerText = "LOGIN TO START EXAM";
             btn.disabled = false;
         }
+    }
+*/
+
+async function handleLogin() {
+        // ... your existing fetch ...
+        const data = await res.json();
+        
+        state.user = data.user;
+        state.config = data.config;
+
+        // UI Transition to Dashboard
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('dashboardPage').classList.remove('hidden');
+        
+        document.getElementById('dashName').innerText = `${data.user.firstName} ${data.user.lastName}`;
+        document.getElementById('dashReg').innerText = data.user.regNumber;
+        document.getElementById('examName').innerText = data.config.name;
+        document.getElementById('examDur').innerText = data.config.durationMinutes;
+        document.getElementById('examSubs').innerText = data.user.subjectCombination.join(', ');
+
+        if(!data.canTakeExam) {
+            document.getElementById('startExamBtn').disabled = true;
+            document.getElementById('startExamBtn').innerText = "Max Attempts Reached";
+        }
+    }
+    
+    async function initiateExam() {
+        // Here we create the Exam record in DB and fetch questions
+        const res = await fetch(`${BASE_URL}/start-exam`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ userId: state.user._id })
+        });
+        const examData = await res.json();
+        state.examId = examData.examId;
+        
+        // Fetch Questions and Hide Dashboard
+        const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
+        state.allQuestions = await qRes.json();
+        
+        document.getElementById('dashboardPage').classList.add('hidden');
+        document.getElementById('examPage').classList.remove('hidden');
+        state.timeLeft = state.config.durationMinutes * 60;
+        
+        renderTabs();
+        renderQuestion();
+        startTimer();
     }
 
     function renderTabs() {
@@ -256,17 +316,29 @@
     }
 
     async function submitProcess() {
-        clearInterval(state.timerInterval);
-        try {
-            const res = await fetch(`${BASE_URL}/submit-exam`, {
-                method: "POST",
-                headers: {"Content-Type":"application/json"},
-                body: JSON.stringify({ examId: state.examId })
-            });
-            const result = await res.json();
-            showResults(result);
-        } catch (e) { alert("Submission failed. Please check your internet."); }
+    // Show a "Processing Result..." overlay so user doesn't click away
+    showLoadingOverlay(true); 
+    
+    try {
+        const res = await fetch(`${BASE_URL}/submit-exam`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ 
+                examId: state.examId,
+                finalTimeLeft: state.timeLeft // Pass this for analytics
+            })
+        });
+
+        if (!res.ok) throw new Error("Server rejected submission");
+
+        const result = await res.json();
+        showResults(result);
+    } catch (e) {
+        alert("Submission Error: Your answers are safe, but we couldn't calculate the score. Please contact the Admin.");
+    } finally {
+        showLoadingOverlay(false);
     }
+}
 
     function showResults(data) {
         document.getElementById('examPage').classList.add('hidden');
