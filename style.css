@@ -5,6 +5,9 @@
     --bg: #f4f7f6;
     --white: #ffffff;
     --text: #333;
+    --primary-dark: #0284c7;
+    --slate-800: #1e293b;
+    --slate-100: #f1f5f9;
 }
 
 body {
@@ -37,7 +40,7 @@ header {
     border-radius: 4px;
     font-family: monospace;
     font-size: 1.5rem;
-    color: #00ff00;
+    color: #ffff00;
     border: 2px solid #444;
 }
 
@@ -83,6 +86,12 @@ input, select {
     padding: 20px;
 }
 
+@media (min-width: 768px) {
+    .admin-container { flex-direction: row; }
+    .sidebar { width: 260px; position: fixed; height: 100vh; }
+    .main-content { margin-left: 260px; width: calc(100% - 260px); }
+}
+
 @media (max-width: 800px) {
     .exam-layout { grid-template-columns: 1fr; }
 }
@@ -115,6 +124,7 @@ input, select {
     padding: 25px;
     border-radius: 5px;
     min-height: 300px;
+    margin-bottom: 5px;
 }
 
 .option {
@@ -187,4 +197,67 @@ th, td {
     padding: 12px;
     border-bottom: 1px solid #ddd;
     text-align: left;
+}
+
+.sym-btn {
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 8px 4px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: 0.2s;
+        color: #334155;
+    }
+    .sym-btn:hover {
+        background: #0ea5e9;
+        color: white;
+        border-color: #0ea5e9;
+        transform: translateY(-2px);
+    }
+ /**   .option-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.opt-toolbar {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 5px;
+    margin-bottom: 8px;
+}
+
+.tool-btn {
+    padding: 2px 8px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.tool-btn.active {
+    background: #0ea5e9;
+    color: white;
+    border-color: #0284c7;
+}
+**/
+.opt-editor {
+    min-height: 40px;
+    padding: 8px;
+    border: 1px solid #f1f5f9;
+    outline-color: #0ea5e9;
+    font-size: 0.95rem;
+}
+
+.opt-img-input {
+    margin-top: 5px;
+    font-size: 11px !important;
+    padding: 5px !important;
 }

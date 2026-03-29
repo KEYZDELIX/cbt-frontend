@@ -9,16 +9,16 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         :root {
-            --sidebar-width: 260px;
+            --sidebar-width: 20%;
             --primary-bg: #f8fafc;
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         body { background-color: var(--primary-bg); margin: 0; font-family: 'Segoe UI', sans-serif; }
-        .admin-container { display: flex; min-height: 100vh; }
+        .admin-container { display: flex; flex-direction: column; min-height: 100vh; }
 
         /* Sidebar */
-        .sidebar { width: var(--sidebar-width); background: #1e293b; color: #f1f5f9; padding: 24px; position: fixed; height: 100vh; }
+        .sidebar { width: var(--sidebar-width); background: #1e293b; color: #f1f5f9; padding: 24px; position: fixed; height: 100vh; z-index: 100; }
         .sidebar h2 { font-size: 1.1rem; color: #38bdf8; letter-spacing: 1px; margin-bottom: 40px; text-transform: uppercase; }
         .nav-item { padding: 14px 18px; cursor: pointer; border-radius: 8px; transition: 0.2s; margin-bottom: 8px; display: flex; align-items: center; font-weight: 500; color: #94a3b8; }
         .nav-item:hover { background: #334155; color: white; }
@@ -28,40 +28,84 @@
         .main-content { flex: 1; margin-left: var(--sidebar-width); padding: 40px; max-width: 1200px; }
         .card { background: white; padding: 30px; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 30px; }
         h3 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 25px; }
+/* Form Grid - Responsive */
+.form-grid { 
+    display: grid; 
+    grid-template-columns: 1fr; /* 1 column on mobile */
+    gap: 20px; 
+}
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .full-width { grid-column: span 2; }
+@media (min-width: 640px) {
+    .form-grid { grid-template-columns: 1fr 1fr; } /* 2 columns on tablets/PC */
+}
+
+.full-width { grid-column: 1 / -1; }
         .input-group label { display: block; font-size: 0.9rem; font-weight: 600; color: #64748b; margin-bottom: 8px; }
         
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
 
         /* Rich Text Toolbar */
         .toolbar { background: #f8fafc; border: 1px solid #e2e8f0; border-bottom: none; border-radius: 6px 6px 0 0; padding: 8px; display: flex; gap: 8px; }
-        .toolbar button { background: white; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; cursor: pointer; }
-        .rich-editor { min-height: 120px; border: 1px solid #e2e8f0; border-radius: 0 0 6px 6px; padding: 12px; background: white; outline-color: #0ea5e9; }
-        
-                /* Options Layout */
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            background: #f1f5f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
+        .toolbar button { background: white; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-weight: bold;}
+        .rich-editor { min-height: 120px; border: 1px solid #e2e8f0; border-radius: 0 0 6px 6px; padding: 12px; background: white; outline-color: #0ea5e9; overflow-y: auto;}
+        /* Beautiful Option Cards */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 15px;
+}
 
-        .option-row {
-            display: grid;
-            grid-template-columns: 40px 1fr 1fr;
-            gap: 12px;
-            align-items: center;
-        }
+@media (min-width: 1024px) {
+    .options-grid { grid-template-columns: 1fr 1fr; } /* Side-by-side options on large screens */
+}
 
+.option-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px;
+    transition: box-shadow 0.3s ease;
+}
+          .option-card:focus-within {
+    box-shadow: 0 0 0 2px var(--primary);
+    border-color: transparent;
+}
+
+/* Shared Toolbar Styling */
+.toolbar {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 8px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tool-btn {
+    padding: 5px 12px;
+    background: none;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.tool-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+}
+.tool-btn u {
+    text-decoration-thickness: 2px;
+}
 
         /* Results Table Odd-Even */
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-        th { background: #f1f5f9; color: #475569; padding: 15px; text-align: left; font-size: 0.75rem; }
+        th { background: #f1f5f9; color: #475569; padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase;}
         td { padding: 15px; border-top: 1px solid #f1f5f9; }
         tr:nth-child(even) { background-color: #f8fafc; }
         tr:hover { background: #f1f5f9; }
@@ -72,7 +116,7 @@
         .stat-card h4 { margin: 0; font-size: 0.8rem; color: #0369a1; }
         .stat-card p { margin: 5px 0 0; font-size: 1.5rem; font-weight: bold; color: #1e293b; }
 
-        .badge-clickable { cursor: pointer; transition: 0.2s; }
+       /** .badge-clickable { cursor: pointer; transition: 0.2s; }
         .badge-clickable:hover { filter: brightness(0.9); transform: scale(1.05); }
                 .btn-save { 
             background: #0ea5e9; 
@@ -83,54 +127,109 @@
             cursor: pointer; 
             font-weight: 600;
             width: 200px;
-        }
+        }**/
+        
+        .btn-save { background: #0ea5e9; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 200px; transition: 0.3s; }
         .btn-save:hover { background: #0284c7; }
-
-
-        .hidden { display: none; }
+        .btn-save:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .hidden { display: none !important; }
+        .badge-btn { padding: 4px 10px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+        
+        /* Modal Styles */
+        .review-item { padding: 15px; margin-bottom: 10px; background: #f8fafc; border-radius: 6px; }
     </style>
 </head>
 <body>
 
 <div class="admin-container">
-    <aside class="sidebar">
-        <h2>STT ADMIN</h2>
-        <div class="nav-item active" onclick="showTab('addUsers')">👥 Manage Users</div>
-        <div class="nav-item" onclick="showTab('addQuestions')">📝 Add Questions</div>
-        <div class="nav-item" onclick="showTab('manageExams')">⚙️ Manage Exams</div>
-        <div class="nav-item" onclick="showTab('results')">📊 View Results</div>
+    <aside class="sidebar"><h2>STT ADMIN</h2>
+        <div class="nav-item active" onclick="showTab('addUsers', this)">👥 Manage Users</div>
+        <div class="nav-item" onclick="showTab('addQuestions', this)">📝 Add Questions</div>
+        <div class="nav-item" onclick="showTab('manageExams', this)">⚙️ Manage Exams</div>
+        <div class="nav-item" onclick="showTab('results', this)">📊 View Results</div>
         <div class="nav-item" style="margin-top: 50px; color: #f87171;" onclick="window.location.href='index.html'">🚪 Logout</div>
+        
     </aside>
 
     <main class="main-content">
         
         <section id="addUsers" class="tab-content">
-            <div class="card">
-                <h3>Student Enrollment</h3>
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>First Name <span onclick="clearField('uFirst')" style="cursor:pointer; color:red; font-size:10px;">Clear</span></label>
-                        <input type="text" id="uFirst" placeholder="John">
-                    </div>
-                    <div class="input-group">
-                        <label>Last Name <span onclick="clearField('uLast')" style="cursor:pointer; color:red; font-size:10px;">Clear</span></label>
-                        <input type="text" id="uLast" placeholder="Doe">
-                    </div>
-                    <div class="input-group">
-                        <label>Password/PIN</label><span onclick="clearField('uPass')" style="cursor:pointer; color:red; font-size:10px;">Clear</span>
-                        <input type="password" id="uPass" placeholder="******">
-                    </div>
-                    <div class="input-group">
-                        <label>Courses</label>
-                        <select id="uSubs" multiple style="height: 100px;">
-                            <option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Economics</option><option>Government</option><option>Literature</option><option>CRK</option><option>IRK</option><option>Accounting</option><option>Commerce</option><option>Agricultural Science</option><option>Geography</option>
-                            
-                        </select>
-                    </div>
-                </div>
-                <button class="btn-save" onclick="registerUser()">Create Account</button>
+    <div class="card">
+        <h3>Student Enrollment</h3>
+        <div class="form-grid">
+            <div class="input-group">
+                <label>First Name <button type="button" class="tool-btn-small" onclick="clearField('uFirst')">Clear</button></label>
+                <input type="text" id="uFirst" placeholder="John">
             </div>
-        </section>
+            <div class="input-group">
+                <label>Middle Name <button type="button" class="tool-btn-small" onclick="clearField('uMiddle')">Clear</button></label>
+                <input type="text" id="uMiddle" placeholder="Optional">
+            </div>
+            <div class="input-group">
+                <label>Last Name <button type="button" class="tool-btn-small" onclick="clearField('uLast')">Clear</button></label>
+                <input type="text" id="uLast" placeholder="Doe">
+            </div>
+
+            <div class="input-group">
+                <label>Gender</label>
+                <select id="uGender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="uEmail" placeholder="student@example.com">
+            </div>
+            <div class="input-group">
+                <label>Phone</label>
+                <input type="tel" id="uPhone" placeholder="080...">
+            </div>
+
+            <div class="input-group">
+                <label>Course of Study</label>
+                <input type="text" id="uCourse" placeholder="e.g. Science">
+            </div>
+            <div class="input-group">
+                <label>Class Level</label>
+                <select id="uClass">
+                    <option value="SS1">SS 1</option>
+                    <option value="SS2">SS 2</option>
+                    <option value="SS3">SS 3</option>
+                </select>
+            </div>
+           <div class="input-group">
+    <label>Password/PIN 
+        <button type="button" class="tool-btn-small" onclick="generatePassword()" style="color: #0ea5e9;">Auto-Gen</button>
+        <button type="button" class="tool-btn-small" onclick="clearField('uPass')">Clear</button>
+    </label>
+    <div style="display: flex; gap: 5px;">
+        <input type="text" id="uPass" placeholder="Click Auto-Gen" style="flex: 1;">
+    </div >
+</div>
+
+            <div class="input-group full-width">
+                <label>Select 3 Elective Subjects (English is Auto-added)</label>
+                <select id="uSubs" multiple style="height: 120px; width: 100%;">
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Economics">Economics</option>
+                    <option value="Government">Government</option>
+                    <option value="Literature">Literature</option>
+                    <option value="Geography">Geography</option>
+                    <option value="Agricultural Science">Agricultural Science</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Accounting">Accounting</option>
+                    <option value="CRK">CRK</option>
+                    <option value="IRK">IRK</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-save" id="regBtn" onclick="registerUser()" style="width: 100%; margin-top: 20px;">Create Account</button>
+    </div>
+</section>
 
         <section id="addQuestions" class="tab-content hidden">
             <div class="card">
@@ -138,22 +237,61 @@
                 <div class="form-grid">
                     <div class="input-group">
                         <label>Subject</label>
-                        <select id="qSubject">
+                        <select id="qSubject" onchange="fetchTopicsBySubject()">
                             <option>Use of English</option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Economics</option><option>Government</option><option>Literature</option><option>CRK</option><option>IRK</option><option>Accounting</option><option>Commerce</option><option>Agricultural Science</option><option>Geography</option>
                         </select>
                     </div>
                     <div class="input-group">
-                        <label>Topic <span id="topicCounter" style="font-weight:normal; color:#0ea5e9;"></span></label>
-                        <input type="text" id="qTopic" placeholder="e.g. Calculus" onfocus="checkTopicCount()">
-                    </div>
-                    <div class="input-group full-width">
-                        <label>Question Body</label><span onclick="clearField('qText')" style="cursor:pointer; color:red; font-size:10px;">Clear</span>
-                        <div class="toolbar">
-                            <button onclick="execCmd('bold')">B</button><button onclick="execCmd('italic')">I</button>
-                            <button onclick="insertMath()">$\sum$ Math</button>
-                        </div>
-                        <div id="qText" class="rich-editor" contenteditable="true"></div>
-                    </div>
+    <label>Topic 
+        <span id="topicStatus" style="font-size: 0.75rem; font-weight: normal; margin-left: 10px; color: #64748b;"></span>
+    </label>
+    <input type="text" id="qTopic" list="topicList" oninput="handleTopicInput()" placeholder="Start typing a topic...">
+    <datalist id="topicList"></datalist>
+</div>
+<div id="topicManagerModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; display:none; align-items:center; justify-content:center; backdrop-filter: blur(8px);">
+    <div style="background:white; padding:30px; border-radius:20px; width:90%; max-width:500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+        <h3 style="margin-top:0; color:#1e293b;">Topic Manager</h3>
+        <p style="color:#64748b; font-size:0.9rem; margin-bottom:20px;">Use this to rename or merge topics across all questions for the selected subject.</p>
+        
+        <div class="input-group" style="margin-bottom:15px;">
+            <label>Current Topic (To Change)</label>
+            <select id="oldTopicSelect" style="width:100%; padding:10px; border-radius:8px; border:1fr solid #cbd5e1;"></select>
+        </div>
+
+        <div class="input-group" style="margin-bottom:20px;">
+            <label>New Name (Merge To)</label>
+            <input type="text" id="newTopicName" placeholder="Corrected topic name..." style="width:100%; padding:10px; border-radius:8px; border:1fr solid #cbd5e1;">
+        </div>
+
+        <div style="display:flex; gap:12px; justify-content:flex-end;">
+            <button onclick="closeTopicManager()" style="background:#f1f5f9; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">Cancel</button>
+            <button onclick="runTopicMerge()" style="background:#f59e0b; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600;">Update All Questions</button>
+        </div>
+    </div>
+</div>
+<div class="input-group">
+    <button type="button" onclick="showTopicAnalytics()" style="background: #6366f1; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        📊 Check Topic Coverage
+    </button>
+    
+    <div id="analyticsPanel" class="hidden" style="margin-top: 10px; background: #f1f5f9; padding: 10px; border-radius: 8px; display: none;">
+        <h5 style="margin: 0 0 10px 0;">Topic Question Counts</h5>
+        <div id="statsList" style="max-height: 150px; overflow-y: auto; font-size: 13px;">
+            </div>
+    </div>
+</div>
+
+<div class="input-group full-width">
+    <label>Question Body</label>
+    <div class="toolbar">
+       <button type="button" class="tool-btn" id="qBold" onclick="formatMain('bold', 'qBold')">B</button>
+    <button type="button" class="tool-btn" id="qItal" onclick="formatMain('italic', 'qItal')">I</button>
+    <button type="button" class="tool-btn" id="qUnder" onclick="formatMain('underline', 'qUnder')"><u>U</u></button>
+    <button type="button" class="tool-btn" onclick="insertMath()">\(\Sigma\)</button> 
+        <button type="button" class="tool-btn" onclick="clearField('qText')" style="cursor:pointer; font-size:10px;">Clear</button>
+    </div>
+    <div id="qText" class="rich-editor" contenteditable="true" onkeyup="checkMainFormat('qBold','qItal','qUnder')" oninput="updateFullPreview()" ></div>
+</div>
                     <div class="input-group full-width">
                         <label>Image URL (Optional)</label>
                         <input type="text" id="qImage" placeholder="https://image-link.com/photo.jpg">
@@ -161,29 +299,42 @@
                 </div>
 
 
-                <label style="font-weight: 600; color: #64748b; margin-bottom: 10px; display: block;">Options & Correct Answer</label>
-                <div class="options-grid">
-                    <div class="option-row">
-                        <input type="radio" name="correct" value="A" checked>
-                        <input type="text" id="optA" placeholder="Option A">
-                        <input type="text" id="optAImg" placeholder="A Image URL">
-                    </div>
-                    <div class="option-row">
-                        <input type="radio" name="correct" value="B">
-                        <input type="text" id="optB" placeholder="Option B">
-                        <input type="text" id="optBImg" placeholder="B Image URL">
-                    </div>
-                    <div class="option-row">
-                        <input type="radio" name="correct" value="C">
-                        <input type="text" id="optC" placeholder="Option C">
-                        <input type="text" id="optCImg" placeholder="C Image URL">
-                    </div>
-                    <div class="option-row">
-                        <input type="radio" name="correct" value="D">
-                        <input type="text" id="optD" placeholder="Option D">
-                        <input type="text" id="optDImg" placeholder="D Image URL">
-                    </div>
-                </div>
+                <label style="font-weight: 600; color: #64748b; margin-bottom: 10px; display: block;">Options (Check the correct one)</label><div class="options-grid"><div id="optionsContainer" class="options-grid">
+    <div class="option-card" id="cardA">
+        <div class="opt-toolbar" >
+            <input type="radio" name="correct" value="A" checked>
+            <button type="button" class="tool-btn" id="boldA" onclick="formatOpt('bold', 'optA', 'boldA', 'italA', 'underA')">B</button>
+            <button type="button" class="tool-btn" id="italA" onclick="formatOpt('italic', 'optA', 'boldA', 'italA', 'underA')">I</button>
+            <button type="button" class="tool-btn" id="underA" onclick="formatOpt('underline', 'optA', 'boldA', 'italA', 'underA')">U</button>
+            <button type="button" class="tool-btn" onclick="openMathModal('optA')">\(\Sigma\)</button>
+              <button type="button" class="tool-btn" onclick="clearField('optA')" style="cursor:pointer; font-size:10px;">Clear</button>
+        </div>
+        <div id="optA" class="opt-editor" contenteditable="true" oninput="updateFullPreview()" onkeyup="checkOptFormat('boldA', 'italA', 'underA')"></div>
+        <input type="text" id="optAImg" class="opt-img-input" placeholder="Image URL">
+    </div>
+
+    <div class="option-card" id="cardB">
+        <div class="opt-toolbar">
+            <input type="radio" name="correct" value="B">
+            <button type="button" class="tool-btn" id="boldB" onclick="formatOpt('bold', 'optB', 'boldB', 'italB', 'underB')">B</button>
+            <button type="button" class="tool-btn" id="italB" onclick="formatOpt('italic', 'optB', 'boldB', 'italB', 'underB')">I</button>
+            <button type="button" class="tool-btn" id="underB" onclick="formatOpt('underline', 'optB', 'boldB', 'italB', 'underB')">U</button>
+            <button type="button" class="tool-btn" onclick="openMathModal('optB')">\(\Sigma\)</button>
+                 <button type="button" class="tool-btn" onclick="clearField('optB')" style="cursor:pointer; font-size:10px;">Clear</button>
+        </div>
+        <div id="optB" class="opt-editor" contenteditable="true" oninput="updateFullPreview()" onkeyup="checkOptFormat('boldB', 'italB', 'underB')"></div>
+        <input type="text" id="optBImg" class="opt-img-input" placeholder="Image URL">
+    </div>
+</div>
+
+<div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+    <button type="button" id="addOptBtn" onclick="addNextOption()" style="background: #10b981; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+        + Add Option
+    </button>
+    <small id="optLimitMsg" style="color: #64748b; display: none;">Maximum 5 options reached.</small>
+</div>
+
+                
 
                 <div class="input-group" style="width: 200px; margin-top: 15px;">
                     <label>Question Weight</label>
@@ -197,44 +348,90 @@
                     <strong style="color: #92400e;">Live Question Preview:</strong>
                     <div id="mathPreview" style="margin-top: 10px;"></div>
                 </div>
+                <div id="fullPreviewContainer" style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 12px; margin-top: 20px;">
+    <h4 style="margin-top:0; color:#64748b;">Live Exam Preview</h4>
+    <div id="pQuestion" style="font-weight: bold; margin-bottom: 15px; font-size: 1.1rem;"></div>
+    <div id="pOptions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        </div>
+</div>
             </div>
         </section>
 
-        <section id="manageExams" class="tab-content hidden">
-            <div class="card">
-                <h3>Exam Configuration</h3>
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>Exam Title</label>
-                        <input type="text" id="exTitle" placeholder="e.g. 2026 Mock Exam">
-                    </div>
-                    <div class="input-group">
-                        <label>Duration (Minutes)</label>
-                        <input type="number" id="exTime" value="60">
-                    </div>
-                    <div class="input-group">
-                        <label>Shuffle Settings</label>
-                        <select id="exShuffle">
-                            <option value="both">Shuffle Questions & Options</option>
-                            <option value="questions">Shuffle Questions Only</option>
-                            <option value="none">Fixed Order</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-    <label>Maximum Attempts</label>
-    <input type="number" id="exAttempts" value="1">
-</div>
-                    <div class="input-group">
-                        <label>Status</label>
-                        <select id="exStatus">
-                            <option value="active">Active</option>
-                            <option value="closed">Closed/Disabled</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="btn-save" onclick="alert('Exam settings updated!')">Save Settings</button>
+       <section id="manageExams" class="tab-content hidden">
+    <div class="card">
+        <h3 id="examFormTitle">Exam Configuration</h3>
+        <input type="hidden" id="editExamId"> <div class="form-grid">
+            <div class="input-group">
+                <label>Exam Title</label>
+                <input type="text" id="exTitle" placeholder="e.g. 2026 Mock Exam">
             </div>
-        </section>
+            <div class="input-group">
+                <label>Duration (Minutes)</label>
+                <input type="number" id="exTime" value="60">
+            </div>
+            <div class="input-group">
+                <label>Shuffle Settings</label>
+                <select id="exShuffle">
+                    <option value="both">Shuffle Questions & Options</option>
+                    <option value="questions">Shuffle Questions Only</option>
+                    <option value="none">Fixed Order</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Maximum Attempts</label>
+                <input type="number" id="exAttempts" value="1">
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="exStatus">
+                    <option value="active">Active</option>
+                    <option value="closed">Closed/Disabled</option>
+                </select>
+            </div>
+
+            <div class="input-group full-width" style="border-top: 1px solid #eee; pt-15;">
+                <label>Assign Students (Group or Individual)</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <select id="groupSelect" style="flex: 2;">
+                        <option value="">-- Add by Class --</option>
+                        <option value="SS1">SS 1 Students</option>
+                        <option value="SS 2">SS 2 Students</option>
+                        <option value="SS 3">SS 3 Students</option>
+                    </select>
+                    <button type="button" class="tool-btn" onclick="addStudentsByGroup()" style="flex: 1;">Add Group</button>
+                </div>
+                
+                <input type="text" id="stuSearch" oninput="searchStudents()" placeholder="Search Name or Reg No...">
+                <div id="stuBadgeContainer" class="tag-container" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;">
+                    </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button id="saveExamBtn" class="btn-save" onclick="saveExamSettings()">Create Exam</button>
+            <button id="cancelEditBtn" class="btn-clear" onclick="resetExamForm()" style="display:none; background:#64748b;">Cancel Edit</button>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+        <h3>Existing Exams</h3>
+        <div style="overflow-x: auto;">
+            <table style="width:100%; text-align: left; border-collapse: collapse;">
+                <thead style="background: #f8fafc;">
+                    <tr>
+                        <th style="padding:12px;">Exam Title</th>
+                        <th>Students</th>
+                        <th>Status</th>
+                        <th>Last Updated</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="examTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</section>
 
         <section id="results" class="tab-content hidden">
             <div class="card">
@@ -261,6 +458,7 @@
                                 <th>Subject Scores (Click to view)</th>
                                 <th>Aggregate</th>
                                 <th>Time Spent</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody id="adminResultBody"></tbody>
@@ -271,7 +469,7 @@
 
     </main>
 </div>
-<div id="scriptModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; overflow-y:auto; padding:40px;">
+<div id="scriptModal" class="hidden" style="position:fixed; top:0; left:0; width:90%; height:90%; background:rgba(0,0,0,0.8); z-index:1000; overflow-y:auto; padding:40px;">
     <div style="background:white; max-width:900px; margin:auto; border-radius:12px; padding:30px; position:relative;">
         <span onclick="closeModal()" style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:24px;">&times;</span>
         <h2 id="modalTitle">Script Review</h2>
@@ -280,43 +478,170 @@
     </div>
 </div>
 
-<script>
-    const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; 
+<div id="mathModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; display:none; align-items:center; justify-content:center; backdrop-filter: blur(4px);">
+    <div style="background:white; padding:25px; border-radius:16px; width:90%; max-width:450px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+        <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 1.2rem;">Insert Equation</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+            <button type="button" class="sym-btn" onclick="addSym('\\frac{}{}')">$\frac{x}{y}$</button>
+            <button type="button" class="sym-btn" onclick="addSym('\\sqrt{}')">$\sqrt{x}$</button>
+            <button type="button" class="sym-btn" onclick="addSym('^{}')">$x^y$</button>
+            <button type="button" class="sym-btn" onclick="addSym('_{}')">$x_y$</button>
+            <button type="button" class="sym-btn" onclick="addSym('\\pi')">$\pi$</button>
+            <button type="button" class="sym-btn" onclick="addSym('\\theta')">$\theta$</button>
+            <button type="button" class="sym-btn" onclick="addSym('\\pm')">$\pm$</button>
+            <button type="button" class="sym-btn" onclick="addSym('\\infty')">$\infty$</button>
+            <button type="button" class="sym-btn" onclick="addSym('\\int')">$\int$</button>
+            <button type="button" class="sym-btn" onclick="addSym('\\Delta')">$\Delta$</button>
+        </div>
 
-    function showTab(tabId) {
+        <input type="text" id="mathInput" placeholder="Enter LaTeX here..." 
+               style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: monospace; font-size: 1.1rem; margin-bottom: 20px;">
+               <div style="display:flex; gap:12px; justify-content:flex-end;">
+            <button onclick="closeMathModal()" style="background:#f1f5f9; color:#475569; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600;">Cancel</button>
+            <button onclick="confirmMath()" style="background:#0ea5e9; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600; box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.4);">Insert Equation</button>
+        </div>
+    </div>
+</div>
+
+<script>
+ const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; 
+    
+//----TABS-------
+function showTab(tabId, element) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(tabId).classList.remove('hidden');
-        event.currentTarget.classList.add('active');
-        if(tabId === 'results') fetchResults();
+        element.classList.add('active');
+        if (tabId === 'results') fetchResults();
+}
+  async function registerUser() {
+    const btn = document.getElementById('regBtn');
+    
+    const payload = {
+        firstName: document.getElementById('uFirst').value,
+        middleName: document.getElementById('uMiddle').value,
+        lastName: document.getElementById('uLast').value,
+        gender: document.getElementById('uGender').value,
+        email: document.getElementById('uEmail').value,
+        phone: document.getElementById('uPhone').value,
+        courseOfStudy: document.getElementById('uCourse').value,
+        classLevel: document.getElementById('uClass').value,
+        password: document.getElementById('uPass').value,
+        subjects: Array.from(document.getElementById('uSubs').selectedOptions).map(o => o.value)
+    };
+
+    // Validation: Exactly 3 electives (to make 4 total with English)
+    if (!payload.firstName || !payload.lastName || payload.subjects.length !== 3) {
+        return alert("Please fill names and select exactly 3 elective subjects.");
     }
 
-    function clearField(id) { document.getElementById(id).value = ""; }
-    function execCmd(cmd) { document.execCommand(cmd, false, null); }
-    function insertMath() {
-        const math = prompt("Enter LaTeX");
-        if(math) document.getElementById('qText').innerHTML += ` \\(${math}\\) `;
-    }
+    btn.disabled = true;
+    btn.innerText = "Generating Reg No...";
 
-    async function checkTopicCount() {
-        const sub = document.getElementById('qSubject').value;
-        const topic = document.getElementById('qTopic').value;
-        if(!topic) return;
-        const res = await fetch(`${BASE_URL}/questions/count?subject=${sub}&topic=${topic}`);
+    try {
+        const res = await fetch(`${BASE_URL}/admin/register-user`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
         const data = await res.json();
-        document.getElementById('topicCounter').innerText = `(${data.count} found)`;
+        if (res.ok) {
+            alert(`Registration Successful!\n\nReg No: ${data.regNumber}\nPassword: ${data.password}\n\nKeep these details for the student.`);
+            
+            // Clear all fields
+            ["uFirst", "uMiddle", "uLast", "uEmail", "uPhone", "uCourse", "uPass"].forEach(id => clearField(id));
+            document.getElementById('uSubs').selectedIndex = -1; // Deselect subjects
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (e) {
+        alert("Server connection failed.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Create Account";
     }
+}
 
-    async function fetchResults() {
+    
+// ----- EXQM CONFIGURATION -----
+async function saveExamSettings() {
+    const payload = {
+        name: document.getElementById('exTitle').value,
+        durationMinutes: document.getElementById('exTime').value,
+        shuffleQuestions: document.getElementById('exShuffle').value !== 'none',
+        shuffleOptions: document.getElementById('exShuffle').value === 'both',
+        maxAttempts: document.getElementById('exAttempts').value, // Make sure this input exists!
+        isActive: document.getElementById('exStatus').value === 'active'
+    };
+
+    try {
+        const res = await fetch(`${BASE_URL}/admin/exam-config`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(payload)
+        });
+        if(res.ok) alert("Exam configurations updated successfully!");
+    } catch (e) {
+        alert("Failed to save settings");
+    }
+}
+
+
+
+//----- QUESTION SAVE ----
+async function saveQuestion() {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerText = "Saving...";
+        const options = [];
+    // Loop through all letters and only add those that exist in the DOM
+    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+        const el = document.getElementById(`opt${letter}`);
+        const img = document.getElementById(`opt${letter}Img`);
+        if (el) {
+            options.push({
+                key: letter,
+                value: el.innerHTML,
+                optionImage: img ? img.value : ""
+            });
+        }
+    });const data = {
+        subject: document.getElementById('qSubject').value,
+        topic: document.getElementById('qTopic').value,
+        questionText: document.getElementById('qText').innerHTML,
+        options: options,
+        correctOptionKey: document.querySelector('input[name="correct"]:checked').value,
+        weight: document.getElementById('qWeight').value
+    };
+
+
+        try {
+            const res = await fetch(`${BASE_URL}/questions`, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify(data)
+            });
+            if(res.ok) alert("Question stored in database!"); location.reload();
+        } catch (e) { alert("Server error"); }
+        
+        btn.disabled = false;
+        btn.innerText = "Save Question";
+    }
+    
+    
+
+//----- FETCH RESULTS ----
+async function fetchResults() {
+  const tbody = document.getElementById('adminResultBody');
+        tbody.innerHTML = "<tr><td colspan='5'>Waking up Render server... please wait...</td></tr>";
         try {
             const res = await fetch(`${BASE_URL}/all-results`);
             const data = await res.json();
             const uniqueUsers = new Set(data.map(r => r.userId?._id));
     document.getElementById('statTotal').innerText = uniqueUsers.size;
             const body = document.getElementById('adminResultBody');
-            
-            // Logic for Analytics stats
-           // document.getElementById('statTotal').innerText = data.length;
             const scores = data.map(r => r.aggregateScore);
             document.getElementById('statHigh').innerText = Math.max(...scores, 0);
             const avg = scores.reduce((a,b) => a+b, 0) / (scores.length || 1);
@@ -329,21 +654,24 @@
                     <td>${r.userId?.lastName || ''}, ${r.userId?.firstName || ''}</td>
                     <td>
                         ${r.subjectResults.map(sr => `
-                            <span class="badge badge-clickable" 
+                           <button class="badge-btn"
                                   onclick="viewScript('${r._id}', '${sr.subjectName}')"
-                                  style="background:#e0f2fe; color:#0369a1; padding:4px 8px; border-radius:4px; margin-right:5px;">
+                          >
                                 ${sr.subjectName}: ${sr.weightedScore}
-                            </span>
+                            </button>
                         `).join('')}
                     </td>
                     <td><strong style="color:#059669">${r.aggregateScore}</strong></td>
                     <td>${r.timeUsed || '--'}m</td>
+                    <td>${new Date(r.examDate).toLocaleDateString()}</td>
                 </tr>
             `).join('');
-        } catch (e) { console.error(e); }
+        } catch (e) { tbody.innerHTML = "<tr><td colspan='5'>Error fetching results.</td></tr>"; }
     }
 
-    async function viewScript(resultId, subject) {
+
+//----- VIEW SCRIPT -----
+async function viewScript(resultId, subject) {
     const modal = document.getElementById('scriptModal');
     const content = document.getElementById('modalContent');
     
@@ -383,70 +711,508 @@
     }
 }
 
-function closeModal() {
-    document.getElementById('scriptModal').classList.add('hidden');
+
+//---- UTILS -----
+function execCmd(command) { document.execCommand(command, false, null); }
+    function insertMath() {
+        openMathModal('qText');
+    }
+    function clearField(id) {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    // Check if it's the rich-text editor (DIV) or a standard input
+    if (element.tagName === 'DIV') {
+        element.innerHTML = '';
+        // Manually trigger the preview update if it's the question box
+        if (id === 'qText') {
+            document.getElementById('mathPreview').innerHTML = '';
+        }
+    } else {
+        element.value = '';
+    }
+    
+    element.focus(); // Place the cursor back in the field for convenience
+}
+    function closeModal() { document.getElementById('scriptModal').classList.add('hidden'); }
+
+
+// ---- OTHERS ----
+    async function checkTopicCount() {
+        const sub = document.getElementById('qSubject').value;
+        const topic = document.getElementById('qTopic').value;
+        if(!topic) return;
+        const res = await fetch(`${BASE_URL}/questions/count?subject=${sub}&topic=${topic}`);
+        const data = await res.json();
+        document.getElementById('topicCounter').innerText = `(${data.count} found)`;
+    }
+
+    const qTextInput = document.getElementById('qText');
+
+// Using 'input' covers typing and 'keyup' ensures it catches deletes/backspaces
+qTextInput.addEventListener('input', () => {
+    const preview = document.getElementById('mathPreview');
+    
+    // Use .innerHTML instead of .value
+    preview.innerHTML = qTextInput.innerHTML;
+    
+    // Trigger MathJax to re-process the new content
+    if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise([preview]).catch((err) => console.log(err));
+    }
+});
+
+let activeTargetId = null; // Tracks which input is currently getting MathJax
+// Function to add symbols to the math input field
+function addSym(sym) {
+    const input = document.getElementById('mathInput');
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const text = input.value;
+    
+    // Insert symbol at cursor position
+    input.value = text.slice(0, start) + sym + text.slice(end);
+    
+    // Set cursor position inside the braces if they exist
+    const newPos = (sym.includes('{}')) ? start + sym.indexOf('{') + 1 : start + sym.length;
+    
+    input.focus();
+    input.setSelectionRange(newPos, newPos);
 }
 
-    // Reuse your existing saveQuestion and registerUser functions here...
-    // MathJax Preview Logic
-    const qTextInput = document.getElementById('qText');
-    qTextInput.addEventListener('input', () => {
-        const preview = document.getElementById('mathPreview');
-        preview.innerHTML = qTextInput.value.replace(/\n/g, '<br>');
-        if(window.MathJax) MathJax.typesetPromise();
-    });
+// Ensure the modal shows correctly (Modified open function)
+function openMathModal(targetId) {
+    activeTargetId = targetId;
+    const modal = document.getElementById('mathModal');
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+    
+    const input = document.getElementById('mathInput');
+    input.value = '';
+    setTimeout(() => input.focus(), 10); // Tiny timeout to ensure focus works
+}
 
-    async function saveQuestion() {
-        const btn = event.target;
-        btn.disabled = true;
-        btn.innerText = "Saving...";
-
-        const data = {
-            subject: document.getElementById('qSubject').value,
-            topic: document.getElementById('qTopic').value,
-            questionText: qTextInput.value,
-            questionImage: document.getElementById('qImage').value,
-            options: [
-                { key: 'A', value: document.getElementById('optA').value, optionImage: document.getElementById('optAImg').value },
-                { key: 'B', value: document.getElementById('optB').value, optionImage: document.getElementById('optBImg').value },
-                { key: 'C', value: document.getElementById('optC').value, optionImage: document.getElementById('optCImg').value },
-                { key: 'D', value: document.getElementById('optD').value, optionImage: document.getElementById('optDImg').value }
-            ],
-            correctOptionKey: document.querySelector('input[name="correct"]:checked').value,
-            weight: document.getElementById('qWeight').value
-        };
-
-        try {
-            const res = await fetch(`${BASE_URL}/questions`, {
-                method: "POST",
-                headers: {"Content-Type":"application/json"},
-                body: JSON.stringify(data)
-            });
-            if(res.ok) alert("Question stored in database!"); location.reload();
-        } catch (e) { alert("Server error"); }
+function closeMathModal() {
+    const modal = document.getElementById('mathModal');
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+}
+function confirmMath() {
+    const math = document.getElementById('mathInput').value;
+    if (math && activeTargetId) {
+        const target = document.getElementById(activeTargetId);
+        const latex = ` \\(${math}\\) `;
         
-        btn.disabled = false;
-        btn.innerText = "Save Question";
+        // Since we changed options to DIVs, they all use innerHTML now
+        target.innerHTML += latex;
+        
+        if (activeTargetId === 'qText') {
+            const preview = document.getElementById('mathPreview');
+            preview.innerHTML = target.innerHTML;
+            if(window.MathJax) MathJax.typesetPromise([preview]);
+        }
+    }
+    closeMathModal();
+}
+
+document.getElementById('mathInput')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') confirmMath();
+});
+
+//----- Toolbar Editor Settings---
+// Formatting for the main Question Text
+function formatMain(cmd, btnId) {
+    document.getElementById('qText').focus();
+    document.execCommand(cmd, false, null);
+    checkMainFormat();
+}
+
+function checkMainFormat() {
+    // Check all three states
+    const isBold = document.queryCommandState('bold');
+    const isItal = document.queryCommandState('italic');
+    const isUnder = document.queryCommandState('underline');
+    
+    // Toggle active classes
+    document.getElementById('qBold').classList.toggle('active', isBold);
+    document.getElementById('qItal').classList.toggle('active', isItal);
+    document.getElementById('qUnder').classList.toggle('active', isUnder);
+    
+    // Update live preview
+    const qText = document.getElementById('qText');
+    const preview = document.getElementById('mathPreview');
+    preview.innerHTML = qText.innerHTML;
+    if(window.MathJax) MathJax.typesetPromise([preview]);
+}
+
+// Formatting for Options
+function formatOpt(cmd, editorId, boldBtnId, italBtnId, underBtnId) {
+    document.getElementById(editorId).focus();
+    document.execCommand(cmd, false, null);
+    checkOptFormat(boldBtnId, italBtnId, underBtnId);
+}
+
+function checkOptFormat(boldBtnId, italBtnId, underBtnId) {
+    const isBold = document.queryCommandState('bold');
+    const isItal = document.queryCommandState('italic');
+    const isUnder = document.queryCommandState('underline');
+    
+    if(boldBtnId) document.getElementById(boldBtnId).classList.toggle('active', isBold);
+    if(italBtnId) document.getElementById(italBtnId).classList.toggle('active', isItal);
+    if(underBtnId) document.getElementById(underBtnId).classList.toggle('active', isUnder);
+}
+
+//------ Options -----
+
+let currentOptionCount = 2;
+const optionLetters = ['A', 'B', 'C', 'D'];
+
+function addNextOption() {
+    if (currentOptionCount >= 5) return;
+
+    const nextLetter = optionLetters[currentOptionCount];
+    const container = document.getElementById('optionsContainer');
+
+    const newCard = document.createElement('div');
+    newCard.className = 'option-card';
+    newCard.id = `card${nextLetter}`;
+
+    // Create the HTML template for the new option
+    newCard.innerHTML = `
+        <div class="opt-toolbar">
+            <input type="radio" name="correct" value="${nextLetter}">
+            <button type="button" class="tool-btn" id="bold${nextLetter}" onclick="formatOpt('bold', 'opt${nextLetter}', 'bold${nextLetter}', 'ital${nextLetter}', 'under${nextLetter}')">B</button>
+            <button type="button" class="tool-btn" id="ital${nextLetter}" onclick="formatOpt('italic', 'opt${nextLetter}', 'bold${nextLetter}', 'ital${nextLetter}', 'under${nextLetter}')">I</button>
+            <button type="button" class="tool-btn" id="under${nextLetter}" onclick="formatOpt('underline', 'opt${nextLetter}', 'bold${nextLetter}', 'ital${nextLetter}', 'under${nextLetter}')">U</button>
+<button type="button" class="tool-btn" onclick="addSigmaToOpt('opt${nextLetter}')">Σ</button>
+              <button type="button" class="tool-btn" onclick="clearField('opt${nextLetter}')" style="cursor:pointer; font-size:10px;">Clear</button>
+            <button type="button" class="tool-btn" style="color:red; margin-left:auto;" onclick="removeOption('${nextLetter}')">–</button>
+            
+        </div>
+        <div id="opt${nextLetter}" class="opt-editor" contenteditable="true" oninput="updateFullPreview()" onkeyup="checkOptFormat('bold${nextLetter}', 'ital${nextLetter}', 'under${nextLetter}')"></div>
+        <input type="text" id="opt${nextLetter}Img" class="opt-img-input" placeholder="Image URL">
+    `;
+    container.appendChild(newCard);
+    currentOptionCount++;
+
+    if (currentOptionCount === 5) {
+        document.getElementById('addOptBtn').style.display = 'none';
+        document.getElementById('optLimitMsg').style.display = 'inline';
+    }
+}
+
+function removeOption(letter) {
+    const card = document.getElementById(`card${letter}`);
+    if (card) {
+        card.remove();
+        currentOptionCount--;
+        document.getElementById('addOptBtn').style.display = 'block';
+        document.getElementById('optLimitMsg').style.display = 'none';
+    }
+}
+
+
+function addSigmaToOpt(targetId) {
+    const target = document.getElementById(targetId);
+    target.innerHTML += ' \\(\\Sigma\\) ';
+    updateFullPreview(); // Refresh the preview
+}
+
+function updateFullPreview() {
+    const pQuestion = document.getElementById('pQuestion');
+    const pOptions = document.getElementById('pOptions');
+    
+    // 1. Update Question Text
+    pQuestion.innerHTML = document.getElementById('qText').innerHTML;
+    
+    // 2. Update Options
+    let optionsHTML = '';
+    ['A', 'B', 'C', 'D'].forEach(letter => {
+        const opt = document.getElementById(`opt${letter}`);
+        if (opt) {
+            // Check if this is the correct answer to highlight it in preview
+            const isCorrect = document.querySelector(`input[name="correct"][value="${letter}"]`).checked;
+            const style = isCorrect ? 'border: 2px solid #10b981; background: #ecfdf5;' : 'border: 1px solid #e2e8f0; background: white;';
+            
+            optionsHTML += `
+                <div style="padding: 10px; border-radius: 8px; ${style}">
+                    <strong>${letter}:</strong> ${opt.innerHTML}
+                </div>`;
+        }
+    });
+    pOptions.innerHTML = optionsHTML;
+
+    // 3. Re-render MathJax
+    if (window.MathJax && window.MathJax.typesetPromise) {
+        MathJax.typesetPromise([pQuestion, pOptions]).catch((err) => console.log(err));
+    }
+}
+
+
+//------ TOPIC HANDLER ------
+let existingTopics = []; // Global store for the current subject's topics
+
+async function fetchTopicsBySubject() {
+    const subject = document.getElementById('qSubject').value;
+    const topicList = document.getElementById('topicList');
+    const status = document.getElementById('topicStatus');
+    
+    if (!subject) {
+        existingTopics = [];
+        topicList.innerHTML = '';
+        status.innerText = '';
+        return;
     }
 
-    async function registerUser() {
-        const payload = {
-            firstName: document.getElementById('uFirst').value,
-            lastName: document.getElementById('uLast').value,
-            password: document.getElementById('uPass').value,
-            subjects: Array.from(document.getElementById('uSubs').selectedOptions).map(o => o.value)
-        };
+    try {
+        // Assuming your backend has an endpoint like /api/topics?subject=Physics
+        const response = await fetch(`/api/topics?subject=${encodeURIComponent(subject)}`);
+        existingTopics = await response.json(); 
 
-        try {
-            const res = await fetch(`${BASE_URL}/admin/register-user`, {
-                method: "POST",
-                headers: {"Content-Type":"application/json"},
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (res.ok) {alert(`Student Registered! Reg No: ${data.regNumber}`); location.reload();
-        } catch (e) { alert("Registration failed"); }
+        // Update the datalist options
+        topicList.innerHTML = existingTopics
+            .map(t => `<option value="${t}">`)
+            .join('');
+
+        status.innerText = `(${existingTopics.length} existing topics found)`;
+        status.style.color = "#64748b";
+    } catch (err) {
+        console.error("Error fetching topics:", err);
     }
+}
+
+function handleTopicInput() {
+    const input = document.getElementById('qTopic').value.trim();
+    const status = document.getElementById('topicStatus');
+
+    if (!input) {
+        status.innerText = `(${existingTopics.length} existing topics)`;
+        status.style.color = "#64748b";
+        return;
+    }
+
+    // Check for exact match (case insensitive)
+    const match = existingTopics.find(t => t.toLowerCase() === input.toLowerCase());
+
+    if (match) {
+        status.innerText = "✓ Using existing topic";
+        status.style.color = "#10b981"; // Green
+    } else {
+        status.innerText = "+ New topic will be created";
+        status.style.color = "#f59e0b"; // Amber/Orange
+    }
+}
+
+// Topic Merger
+function openTopicManager() {
+    const subject = document.getElementById('qSubject').value;
+    if (!subject) return alert("Please select a subject first!");
+
+    const modal = document.getElementById('topicManagerModal');
+    const select = document.getElementById('oldTopicSelect');
+    
+    // Fill the dropdown with the topics we already fetched
+    select.innerHTML = existingTopics.map(t => `<option value="${t}">${t}</option>`).join('');
+    
+    modal.style.display = 'flex';
+}
+
+function closeTopicManager() {
+    document.getElementById('topicManagerModal').style.display = 'none';
+}
+
+async function runTopicMerge() {
+    const subject = document.getElementById('qSubject').value;
+    const oldTopic = document.getElementById('oldTopicSelect').value;
+    const newTopic = document.getElementById('newTopicName').value.trim();
+
+    if (!newTopic) return alert("Please enter a new name.");
+    if (!confirm(`This will rename "${oldTopic}" to "${newTopic}" for ALL ${subject} questions. Proceed?`)) return;
+
+    try {
+        const response = await fetch('/api/topics/merge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subject, oldTopic, newTopic })
+        });
+
+        if (response.ok) {
+            alert("Topics updated successfully!");
+            closeTopicManager();
+            fetchTopicsBySubject(); // Refresh the list
+        }
+    } catch (err) {
+        alert("Update failed. Check console.");
+    }
+}
+
+async function showTopicAnalytics() {
+    const subject = document.getElementById('qSubject').value;
+    if (!subject) return alert("Select a subject first.");
+
+    const panel = document.getElementById('analyticsPanel');
+    const list = document.getElementById('statsList');
+    
+    panel.style.display = 'block';
+    list.innerHTML = "Loading...";
+
+    try {
+        const response = await fetch(`/api/topics/stats?subject=${encodeURIComponent(subject)}`);
+        const stats = await response.json();
+
+        if (stats.length === 0) {
+            list.innerHTML = "No questions found for this subject.";
+            return;
+        }
+
+        list.innerHTML = stats.map(item => {
+            // Logic: Highlight in red if fewer than 5 questions
+            const isLow = item.count < 5;
+            const color = isLow ? '#ef4444' : '#1e293b';
+            const warning = isLow ? ' ⚠️ (Needs more)' : '';
+
+            return `
+                <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: ${color};">
+                    <span>${item._id}${warning}</span>
+                    <strong>${item.count}</strong>
+                </div>`;
+        }).join('');
+
+    } catch (err) {
+        list.innerHTML = "Error loading stats.";
+    }
+}
+// Attach this to your format functions so it updates when you click Bold/Italic too!
+
+
+//--------- Manage Exam ---------let assignedStudentList = []; // Array of Reg Numbers
+
+// 1. Enter "Edit Mode"
+function editExam(exam) {
+    // Fill the inputs
+    document.getElementById('editExamId').value = exam._id;
+    document.getElementById('exTitle').value = exam.title;
+    document.getElementById('exTime').value = exam.duration;
+    document.getElementById('exShuffle').value = exam.shuffleType || 'both';
+    document.getElementById('exAttempts').value = exam.attempts || 1;
+    document.getElementById('exStatus').value = exam.status || 'active';
+    
+    // Load the assigned students
+    assignedStudentList = exam.assignedStudents || [];
+    renderStudentBadges();
+
+    // UI Changes
+    document.getElementById('examFormTitle').innerText = "Editing: " + exam.title;
+    document.getElementById('saveExamBtn').innerText = "Update Exam Settings";
+    document.getElementById('cancelEditBtn').style.display = "inline-block";
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 2. Save Logic
+async function saveExamSettings() {
+    const examId = document.getElementById('editExamId').value;
+    const examData = {
+        id: examId, // Will be empty string for new exams
+        title: document.getElementById('exTitle').value,
+        duration: document.getElementById('exTime').value,
+        shuffleType: document.getElementById('exShuffle').value,
+        attempts: document.getElementById('exAttempts').value,
+        status: document.getElementById('exStatus').value,
+        assignedStudents: assignedStudentList
+    };
+
+    if (!examData.title) return alert("Please enter an Exam Title");
+
+    try {
+        const response = await fetch('/api/exams/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(examData)
+        });
+
+        if (response.ok) {
+            alert(examId ? "Exam Updated!" : "Exam Created!");
+            resetExamForm();
+            loadExams(); // Refresh the table
+        }
+    } catch (err) {
+        console.error("Save failed", err);
+    }
+}
+
+// 3. Reset Form
+function resetExamForm() {
+    document.getElementById('editExamId').value = "";
+    document.getElementById('exTitle').value = "";
+    document.getElementById('exTime').value = "60";
+    document.getElementById('examFormTitle').innerText = "Exam Configuration";
+    document.getElementById('saveExamBtn').innerText = "Create Exam";
+    document.getElementById('cancelEditBtn').style.display = "none";
+    assignedStudentList = [];
+    renderStudentBadges();
+}
+function renderStudentBadges() {
+    const container = document.getElementById('stuBadgeContainer');
+    container.innerHTML = assignedStudentList.map(regNo => `
+        <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:15px; font-size:12px; display:flex; align-items:center; gap:5px;">
+            ${regNo} 
+            <b onclick="removeStudent('${regNo}')" style="cursor:pointer; color:#ef4444;">&times;</b>
+        </span>
+    `).join('');
+}
+
+function removeStudent(regNo) {
+    assignedStudentList = assignedStudentList.filter(s => s !== regNo);
+    renderStudentBadges();
+}
+
+// Add all students from a specific class (SS1, SS2, or SS3)
+async function addStudentsByGroup() {
+    const className = document.getElementById('groupSelect').value;
+    if (!className) return;
+
+    try {
+        const response = await fetch(`/api/students/by-group?class=${encodeURIComponent(className)}`);
+        const regNumbers = await response.json();
+        
+        // Merge with existing list, preventing duplicates
+        const uniqueList = new Set([...assignedStudentList, ...regNumbers]);
+        assignedStudentList = Array.from(uniqueList);
+        
+        renderStudentBadges();
+    } catch (err) {
+        alert("Error adding group");
+    }
+}
+
+// Search and add individual students
+async function searchStudents() {
+    const query = document.getElementById('stuSearch').value;
+    if (query.length < 2) return; // Don't search for just 1 letter
+
+    try {
+        const response = await fetch(`/api/students/search?q=${encodeURIComponent(query)}`);
+        const students = await response.json();
+        
+        // Show a small dropdown or just add the first result if it's an exact RegNo match
+        // For simplicity, let's assume if they find the right one, they click it
+        // (You could expand this to show a dropdown list)
+        console.log("Found students:", students);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+//---- PASSWORD GENERATION-----
+function generatePassword() {
+    const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // Removed confusing chars like 0, O, 1, I
+    let pass = "";
+    for (let i = 0; i < 6; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('uPass').value = pass;
+}
 
 </script>
 </body>

@@ -89,13 +89,14 @@
     const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; 
     
     let state = {
+        user: null,
         examId: null,
         userId: null,
         allQuestions: [], 
         currentSubIndex: 0,
         currentQIndex: 0,
         answers: {}, 
-        timeLeft: 120 * 60,
+        timeLeft: 0,
         timerInterval: null
     };
 
@@ -153,52 +154,92 @@
         }
     }
 */
-
 async function handleLogin() {
-        // ... your existing fetch ...
-        const data = await res.json();
-        
-        state.user = data.user;
-        state.config = data.config;
+    const regNumber = document.getElementById('regNumber').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
 
-        // UI Transition to Dashboard
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('dashboardPage').classList.remove('hidden');
-        
-        document.getElementById('dashName').innerText = `${data.user.firstName} ${data.user.lastName}`;
-        document.getElementById('dashReg').innerText = data.user.regNumber;
-        document.getElementById('examName').innerText = data.config.name;
-        document.getElementById('examDur').innerText = data.config.durationMinutes;
-        document.getElementById('examSubs').innerText = data.user.subjectCombination.join(', ');
+    if(!regNumber || !password) return alert("Please enter both credentials");
 
-        if(!data.canTakeExam) {
-            document.getElementById('startExamBtn').disabled = true;
-            document.getElementById('startExamBtn').innerText = "Max Attempts Reached";
-        }
-    }
-    
-    async function initiateExam() {
-        // Here we create the Exam record in DB and fetch questions
-        const res = await fetch(`${BASE_URL}/start-exam`, {
+    btn.innerText = "Authenticating...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch(`${BASE_URL}/login`, {
             method: "POST",
             headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({ userId: state.user._id })
+            body: JSON.stringify({ regNumber, password })
         });
-        const examData = await res.json();
-        state.examId = examData.examId;
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            errorEl.innerText = data.message || "Login failed";
+            btn.innerText = "LOGIN TO START EXAM";
+            btn.disabled = false;
+            return;
+        }
+
+        // CORRECT MAPPING based on your server.js response
+        state.userId = data.userId;
+        state.examId = data.examId;
         
-        // Fetch Questions and Hide Dashboard
+        // Update UI
+        document.getElementById('dashName').innerText = `${data.firstName} ${data.lastName}`;
+        document.getElementById('dashReg').innerText = data.regNumber;
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('dashboardPage').classList.remove('hidden');
+
+    } catch (err) {
+        console.error(err);
+        errorEl.innerText = "Server connection failed.";
+        btn.disabled = false;
+    }
+}
+
+    async function initiateExam() {
+    const startBtn = document.getElementById('startExamBtn');
+    startBtn.innerText = "Loading Questions...";
+    startBtn.disabled = true;
+
+    try {
+        // 1. Create the Exam Session in Backend
+        const res = await fetch(`${BASE_URL}/login`, { // Or a specific /start-exam route if you created one
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ regNumber: state.user.regNumber, password: state.user.password })
+        });
+        const data = await res.json();
+        
+        // 2. Set the global examId
+        state.examId = data.examId; 
+
+        // 3. Fetch the randomized questions
         const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
-        state.allQuestions = await qRes.json();
+        const questionsData = await qRes.json();
         
+        if (!qRes.ok) throw new Error("Could not load questions");
+
+        state.allQuestions = questionsData;
+        
+        // 4. Switch UI
         document.getElementById('dashboardPage').classList.add('hidden');
         document.getElementById('examPage').classList.remove('hidden');
-        state.timeLeft = state.config.durationMinutes * 60;
         
+        // 5. Initialize Exam UI
         renderTabs();
         renderQuestion();
-        startTimer();
+        startTimer(); // Ensure this function exists!
+        
+    } catch (err) {
+        console.error("Start Exam Error:", err);
+        alert("Failed to start exam. Check console for details.");
+        startBtn.disabled = false;
+        startBtn.innerText = "START EXAMINATION NOW";
     }
+}
+    
 
     function renderTabs() {
         const container = document.getElementById('subjectTabs');
