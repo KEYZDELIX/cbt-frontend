@@ -261,3 +261,14 @@ th, td {
     font-size: 11px !important;
     padding: 5px !important;
 }
+
+.btn-edit-sm {
+    background: #f59e0b; color: white; border: none; padding: 6px 10px; 
+    border-radius: 6px; cursor: pointer; transition: 0.2s;
+}
+.btn-delete-sm {
+    background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; padding: 6px 10px; 
+    border-radius: 6px; cursor: pointer; transition: 0.2s;
+}
+.btn-edit-sm:hover { background: #d97706; }
+.btn-delete-sm:hover { background: #ef4444; color: white; }
