@@ -857,71 +857,15 @@ async function loadQuestions() {
                     </td>
                 </tr>
             `;
+            document.getElementById('qCounter').innerText = questions.length;
         }).join('');
 
     } catch (err) {
-        console.error("Load failed:", err);
+        console.error("DETAILED ERROR:", err);
+        tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;"> Error: ${err.message}. Check Console for details.</td></tr>';
     }
 }
-document.getElementById('qCounter').innerText = questions.length;
 
-/**  Before
-async function loadQuestions() {
-    const subjectFilter = document.getElementById('manageSubFilter').value;
-    const searchQuery = document.getElementById('manageSearch').value.toLowerCase();
-    const tableBody = document.getElementById('questionsTableBody');
-
-    try {
-        // Fetch questions from your backend
-        const res = await fetch(`${BASE_URL}/questions`);
-        let questions = await res.json();
-
-        // 1. Filter by Subject
-        if (subjectFilter) {
-            questions = questions.filter(q => q.subject === subjectFilter);
-        }
-
-        // 2. Filter by Search (Topic or Question Text)
-        if (searchQuery) {
-            questions = questions.filter(q => 
-                q.topic.toLowerCase().includes(searchQuery) || 
-                q.questionText.toLowerCase().includes(searchQuery)
-            );
-        }
-
-        // 3. Render to Table
-        tableBody.innerHTML = questions.map(q => {
-        // Helper to turn HTML into plain text for the snippet
-        const plainText = q.questionText.replace(/<[^>]*>/g, '').substring(0, 60);
-        
-        // Create a small string of the options
-        const optionsSnippet = q.options.map(opt => 
-            `<span style="color:#94a3b8; margin-right:8px;">${opt.key}: ${opt.value.replace(/<[^>]*>/g, '').substring(0, 15)}...</span>`
-        ).join('');
-        return `
-            <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px;">
-                    <span style="display:block; font-weight:bold; color:#1e293b;">${q.topic}</span>
-                    <small style="color:#64748b;">${q.subject}</small>
-                </td>
-                <td style="padding: 12px;">
-                    <div style="font-weight: 500; margin-bottom: 5px;">${plainText}...</div>
-                    <div style="font-size: 0.8rem;">${optionsSnippet}</div>
-                </td>
-                <td style="padding: 12px; text-align: center;">
-                    <div style="display:flex; gap:5px; justify-content:center;">
-                        <button onclick='prepareEdit(${JSON.stringify(q)})' class="btn-edit-sm" title="Edit">✏️</button>
-                        <button onclick="deleteQuestion('${q._id}', '${q.topic}')" class="btn-delete-sm" title="Delete">🗑️</button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
-     } catch (err) {
-        tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Error loading questions.</td></tr>';
-    }
-}
-**/
 
 function prepareEdit(q) {
     // 1. Mark the ID we are editing
@@ -1461,7 +1405,8 @@ async function showTopicAnalytics() {
 // Attach this to your format functions so it updates when you click Bold/Italic too!
 
 
-//--------- Manage Exam ---------let assignedStudentList = []; // Array of Reg Numbers
+//--------- Manage Exam ---------
+let assignedStudentList = []; // Array of Reg Numbers
 
 // 1. Enter "Edit Mode"
 function editExam(exam) {
