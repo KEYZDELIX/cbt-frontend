@@ -272,3 +272,18 @@ th, td {
 }
 .btn-edit-sm:hover { background: #d97706; }
 .btn-delete-sm:hover { background: #ef4444; color: white; }
+
+.table-scroll-cell {
+    max-width: 300px;
+    max-height: 80px;
+    overflow: auto;
+    font-size: 0.85rem;
+    padding: 5px;
+    border: 1px solid #eee;
+    white-space: normal; /* Allows wrapping but scrolls if height exceeded */
+}
+.options-preview { color: #64748b; margin-top: 5px; border-top: none; }
+
+#qregBtn {
+    transition: background-color 0.3s ease, transform 0.1s active;
+}
