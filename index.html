@@ -3,383 +3,634 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STT JAMB MOCK 2026</title>
+    <title>STT JAMB MOCK 2026 | Student Portal</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Quick Calculator Styling */
+        #calc-widget {
+            position: absolute; top: 70px; right: 20px; width: 200px;
+            background: #222; padding: 10px; border-radius: 8px; z-index: 1000;
+        }
+        .calc-display { width: 100%; background: #000; color: #0f0; text-align: right; margin-bottom: 5px; padding: 5px; font-family: monospace; }
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+}
+.calc-btn {
+    padding: 8px 2px;
+    border-radius: 4px;
+    border: none;
+    background: #333;
+    color: white;
+    cursor: pointer;
+}
+.calc-btn.sci {
+    background: #444;
+    color: #00d4ff;
+}
+        
+        /* Fixed Question Area Styling */
+        .question-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            height: 60vh; /* Fixed height */
+            overflow-y: auto; /* Internal scroll */
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        /* Compact Navigation Grid */
+        .q-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px; /* Tighter gap */
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
 
 <header>
-    <div class="logo"><strong>2026 SST UTME (JAMB) MOCK </strong></div>
-    <div class="timer-box" id="timer">02:00:00</div>
-    <div id="userDisplayName" style="font-size: 0.9rem;"></div>
+    <div class="logo"><strong>STT 2026 UTME MOCK</strong></div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <button class="sym-btn" onclick="toggleCalculator()">🧮 Calculator</button>
+        <div class="timer-box" id="timer">00:00:00</div>
+    </div>
 </header>
 
 <div id="loginPage" class="auth-container">
-    <div style="margin-bottom: 20px;">
-        <img src="https://via.placeholder.com/80" alt="Logo" style="border-radius: 50%;">
-        <h2>SST Student Login</h2>
-    </div>
+    <img src="https://via.placeholder.com/80" alt="Logo" style="border-radius: 50%; margin-bottom: 10px;">
+    <h2>Student Login</h2>
     <div style="text-align: left;">
         <label>Registration Number</label>
-        <input type="text" id="regNumber" placeholder="e.g. STT203455AB">
-        
-        <label>Password / PIN</label>
-        <input type="password" id="password" placeholder="••••••••">
+        <input type="text" id="regNumber" placeholder="STT/2026/001">
+        <label>PIN / Password</label>
+        <input type="password" id="password" placeholder="••••">
     </div>
-    <button class="btn-main" style="margin-top: 20px;" id="loginBtn" onclick="handleLogin()">
-        LOGIN TO START EXAM
-    </button>
-    
+    <button class="btn-main" id="loginBtn" onclick="handleLogin()">LOGIN</button>
     <p id="loginError" style="color: var(--accent); font-size: 0.8rem; margin-top: 10px;"></p>
+    <p style="font-size: 0.8rem; cursor: pointer; color: var(--primary);" onclick="alert('Please contact the System Admin at the front desk.')">Forgot Password?</p>
 </div>
 
 <div id="dashboardPage" class="hidden auth-container">
-    <div class="card">
-        <h3>Welcome, <span id="dashName"></span></h3>
-        <p><strong>Reg No:</strong> <span id="dashReg"></span></p>
-        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
-            <p><strong>Available Exam:</strong> <span id="examName"></span></p>
-            <p><strong>Duration:</strong> <span id="examDur"></span> Minutes</p>
-            <p><strong>Subjects:</strong> <span id="examSubs"></span></p>
+    <h3>Welcome, <span id="dashName"></span></h3>
+    <div id="examNotice" style="background: #fff8e1; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left; border-left: 5px solid #ffc107;">
         </div>
-        <button class="btn-main" id="startExamBtn" onclick="initiateExam()">START EXAMINATION NOW</button>
+    <button class="btn-main" id="proceedBtn" onclick="showInstructions()">PROCEED TO INSTRUCTIONS</button>
+</div>
+
+<div id="instructionsPage" class="hidden auth-container" style="text-align: left;">
+    <h3 style="text-align: center;">Examination Instructions</h3>
+    <hr>
+    <p>Please read carefully before starting:</p>
+    <ul style="line-height: 1.6;">
+        <li><strong>Total Questions:</strong> <span id="totalQs">180</span></li>
+        <li><strong>Duration:</strong> <span id="totalMins">120</span> Minutes</li>
+        <li><strong>Auto-Save:</strong> Your progress is saved every 2 seconds.</li>
+        <li><strong>Navigation:</strong> Use the subject tabs to switch between papers.</li>
+    </ul>
+    <div style="background: #f1f5f9; padding: 10px; font-size: 0.85rem; border-radius: 5px;">
+        ⚠️ Do not refresh this page once the exam starts.
     </div>
+    <button class="btn-main" style="margin-top: 20px;" id="startExamBtn" onclick="initiateExam()">START EXAMINATION</button>
 </div>
 
 <div id="examPage" class="hidden">
+  <div id="calc-widget" class="hidden">
+    <input type="text" id="calcScreen" class="calc-display" readonly value="0">
+    <div class="calc-grid">
+        <button class="calc-btn sci" onclick="calcSci('sin')">sin</button>
+        <button class="calc-btn sci" onclick="calcSci('cos')">cos</button>
+        <button class="calc-btn sci" onclick="calcSci('tan')">tan</button>
+        <button class="calc-btn sci" onclick="calcSci('log')">log</button>
+
+        <button class="calc-btn sci" onclick="calcInput('(')">(</button>
+        <button class="calc-btn sci" onclick="calcInput(')')">)</button>
+        <button class="calc-btn sci" onclick="calcInput('**')">xʸ</button>
+        <button class="calc-btn sci" onclick="calcSci('sqrt')">√</button>
+
+        <button class="calc-btn" onclick="calcInput('7')">7</button>
+        <button class="calc-btn" onclick="calcInput('8')">8</button>
+        <button class="calc-btn" onclick="calcInput('9')">9</button>
+        <button class="calc-btn" onclick="calcClear()" style="color:var(--accent);">C</button>
+
+        <button class="calc-btn" onclick="calcInput('4')">4</button>
+        <button class="calc-btn" onclick="calcInput('5')">5</button>
+        <button class="calc-btn" onclick="calcInput('6')">6</button>
+        <button class="calc-btn" onclick="calcInput('/')">÷</button>
+
+        <button class="calc-btn" onclick="calcInput('1')">1</button>
+        <button class="calc-btn" onclick="calcInput('2')">2</button>
+        <button class="calc-btn" onclick="calcInput('3')">3</button>
+        <button class="calc-btn" onclick="calcInput('*')">×</button>
+
+        <button class="calc-btn" onclick="calcInput('0')">0</button>
+        <button class="calc-btn" onclick="calcInput('.')">.</button>
+        <button class="calc-btn" onclick="calcInput('-')">-</button>
+        <button class="calc-btn" onclick="calcInput('+')">+</button>
+
+        <button class="calc-btn sci" style="grid-column: span 2; font-size: 0.7rem;" onclick="toggleFraction()">Dec ⟷ Frac</button>
+        <button class="calc-btn" style="grid-column: span 2; background:var(--secondary); color:white; font-weight: bold;" onclick="calcSolve()">=</button>
+    </div>
+</div>
+
+
     <div class="subject-tabs" id="subjectTabs"></div>
     
     <div class="exam-layout">
         <main>
-            <div class="question-card" id="questionArea">
-                <p>Loading questions...</p>
-            </div>
+            <div class="question-card" id="questionArea"></div>
             <div style="margin-top: 20px; display: flex; justify-content: space-between;">
-                <button class="btn-main" style="width: 120px;" onclick="prevQuestion()">Previous</button>
-                <button class="btn-main" style="width: 120px;" onclick="nextQuestion()">Next</button>
+                <button class="btn-main" style="width: 120px; background: var(--primary);" onclick="prevQuestion()">Previous</button>
+                <button class="btn-main" style="width: 120px; background: var(--primary);" onclick="nextQuestion()">Next</button>
             </div>
         </main>
 
         <aside class="nav-panel">
-            <h4>Question Palette</h4>
+            <h4>Question Grid</h4>
             <div class="q-grid" id="questionGrid"></div>
             <hr>
-            <button class="btn-main" style="background: #e74c3c;" onclick="confirmSubmit()">SUBMIT EXAM</button>
+            <button class="btn-main" style="background: var(--accent);" onclick="confirmSubmit()">SUBMIT EXAM</button>
         </aside>
     </div>
 </div>
 
-<div id="resultPage" class="hidden">
-    <div class="result-container">
-        <h2>Examination Result</h2>
-        <div id="scoreCircle" style="font-size: 3rem; color: #1abc9c; margin: 20px 0;"></div>
-        <table id="resultTable">
-            <thead>
-                <tr><th>Subject</th><th>Score</th></tr>
-            </thead>
-            <tbody id="resultBody"></tbody>
-        </table>
-        <button class="btn-main" onclick="location.reload()">Take Another Mock</button>
-    </div>
-</div>
-
 <script>
-    const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; 
+    const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; let saveTimeout;
     
-    let state = {
-        user: null,
-        examId: null,
-        userId: null,
-        allQuestions: [], 
-        currentSubIndex: 0,
-        currentQIndex: 0,
-        answers: {}, 
-        timeLeft: 0,
-        timerInterval: null
-    };
+let state = {
+    userId: null,
+    examId: null,
+    allQuestions: [], 
+    currentSubIndex: 0,
+    currentQIndex: 0,
+    answers: {}, 
+    timeLeft: 7200,
+    timerInterval: null,
+    lastTabSwitch: Date.now(),
+    subjectTime: {} // Tracks total seconds per subject
+};
 
-    /*async function handleLogin() {
+// HELPER: Prepare the data package for the DB
+function preparePayload(status = "active") {
+    const responses = [];
+    state.allQuestions.forEach(sub => {
+        sub.questions.forEach(q => {
+            if (state.answers[q._id]) {
+                responses.push({
+                    questionId: q._id,
+                    selectedOptionKey: state.answers[q._id],
+                    subject: sub.subject,
+                    timestamp: new Date()
+                });
+            }
+        });
+    });
+
+    const subjectAnalysis = Object.entries(state.subjectTime).map(([name, sec]) => ({
+        subjectName: name,
+        secondsSpent: sec
+    }));
+
+    return {
+        userId: state.userId,
+        examId: state.examId,
+        responses: responses,
+        subjectAnalysis: subjectAnalysis,
+        totalSecondsRemaining: state.timeLeft,
+        status: status
+    };
+}
+    
+
+    // --- AUTH LOGIC (Fixed async and scope) ---
+    async function handleLogin() {
         const regNumber = document.getElementById('regNumber').value.trim();
         const password = document.getElementById('password').value.trim();
-        const errorEl = document.getElementById('loginError');
-        const btn = document.getElementById('loginBtn');
-
-        if(!regNumber || !password) return alert("Please enter both Reg Number and Password");
-
-        errorEl.innerText = "";
-        btn.innerText = "Authenticating...";
-        btn.disabled = true;
-
+        const errorDisplay = document.getElementById('loginError');
+        
         try {
-            const res = await fetch(`${BASE_URL}/login`, {
+            errorDisplay.innerText = "Logging in...";
+            const res = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: "POST",
                 headers: {"Content-Type":"application/json"},
                 body: JSON.stringify({ regNumber, password })
             });
-
             const data = await res.json();
 
-            if (!res.ok) {
-                errorEl.innerText = data.message || "Login failed";
-                btn.innerText = "LOGIN TO START EXAM";
-                btn.disabled = false;
-                return;
+            if (!res.ok) throw new Error(data.message || "Login failed");
+
+            state.userId = data.user._id;
+            state.userRegNo = data.user.regNo;
+            state.examId = data.resumeSessionId || null;
+
+            const fullName = [data.user.firstName, data.user.middleName, data.user.lastName].filter(Boolean).join(' ');
+            document.getElementById('dashName').innerText = fullName;
+
+            const notice = document.getElementById('examNotice');
+            if (data.allocation) {
+                notice.innerHTML = `
+                    <p><strong>Reg No:</strong> ${data.user.regNo}</p>
+                    <p><strong>Subjects:</strong> ${data.user.subjectCombination.join(', ')}</p>
+                    <hr>
+                    <p><strong>Exam:</strong> ${data.allocation.title}</p>
+                    <p><strong>Batch:</strong> ${data.allocation.batchNumber}</p>
+                `;
+                document.getElementById('proceedBtn').disabled = false;
+            } else {
+                notice.innerHTML = `<p style="color:red">No active exam scheduled for you.</p>`;
+                document.getElementById('proceedBtn').disabled = true;
             }
 
-            // SUCCESS: Set state
-            state.examId = data.examId;
-            state.userId = data.userId;
-
-            // Fetch Questions
-            const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
-            if (!qRes.ok) throw new Error("Could not load questions.");
-            state.allQuestions = await qRes.json();
-
-            // UI Transition
-            document.getElementById('userDisplayName').innerText = `${data.firstName} ${data.lastName} (${data.regNumber})`;
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('examPage').classList.remove('hidden');
-            
-            renderTabs();
-            renderQuestion();
-            startTimer();
-
+            switchPage('loginPage', 'dashboardPage');
         } catch (err) {
-            console.error(err);
-            errorEl.innerText = "Connection error. Is the server running?";
-            btn.innerText = "LOGIN TO START EXAM";
-            btn.disabled = false;
+            errorDisplay.innerText = err.message;
         }
     }
-*/
-async function handleLogin() {
-    const regNumber = document.getElementById('regNumber').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const errorEl = document.getElementById('loginError');
-    const btn = document.getElementById('loginBtn');
+    
+    // Show instructionsPage
+    function showInstructions() { switchPage('dashboardPage',
+    'instructionsPage'); }
 
-    if(!regNumber || !password) return alert("Please enter both credentials");
-
-    btn.innerText = "Authenticating...";
-    btn.disabled = true;
-
-    try {
-        const res = await fetch(`${BASE_URL}/login`, {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({ regNumber, password })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            errorEl.innerText = data.message || "Login failed";
-            btn.innerText = "LOGIN TO START EXAM";
-            btn.disabled = false;
-            return;
-        }
-
-        // CORRECT MAPPING based on your server.js response
-        state.userId = data.userId;
-        state.examId = data.examId;
-        
-        // Update UI
-        document.getElementById('dashName').innerText = `${data.firstName} ${data.lastName}`;
-        document.getElementById('dashReg').innerText = data.regNumber;
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('dashboardPage').classList.remove('hidden');
-
-    } catch (err) {
-        console.error(err);
-        errorEl.innerText = "Server connection failed.";
-        btn.disabled = false;
-    }
-}
-
+    // --- EXAM CORE (Fixed the initiateExam syntax) ---
     async function initiateExam() {
-    const startBtn = document.getElementById('startExamBtn');
-    startBtn.innerText = "Loading Questions...";
-    startBtn.disabled = true;
-
+    const proceedBtn = document.getElementById('startExamBtn');
     try {
-        // 1. Create the Exam Session in Backend
-        const res = await fetch(`${BASE_URL}/login`, { // Or a specific /start-exam route if you created one
+        proceedBtn.disabled = true;
+        proceedBtn.innerText = "Securing Session...";
+
+        // 1. First, get the ID from the server
+        const sessionRes = await fetch(`${BASE_URL}/api/exams/start-exam`, {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ regNumber: state.user.regNumber, password: state.user.password })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: state.userId })
         });
-        const data = await res.json();
         
-        // 2. Set the global examId
-        state.examId = data.examId; 
+        const sessionData = await sessionRes.json();
+        
+        if (!sessionRes.ok || !sessionData.examId) {
+            throw new Error(sessionData.error || "Could not initialize exam session.");
+        }
 
-        // 3. Fetch the randomized questions
-        const qRes = await fetch(`${BASE_URL}/fetch-questions/${state.examId}`);
-        const questionsData = await qRes.json();
-        
-        if (!qRes.ok) throw new Error("Could not load questions");
+        // 2. Set the ID into the state immediately
+        state.examId = sessionData.examId;
+        console.log("Session Secured:", state.examId);
 
-        state.allQuestions = questionsData;
+        // 3. Fetch the questions
+        proceedBtn.innerText = "Downloading Questions...";
+        const qRes = await fetch(`${BASE_URL}/api/exams/fetch-questions/${state.examId}`);
         
-        // 4. Switch UI
-        document.getElementById('dashboardPage').classList.add('hidden');
-        document.getElementById('examPage').classList.remove('hidden');
+        if (!qRes.ok) throw new Error("Question download failed.");
+
+        const qData = await qRes.json(); 
+
+        // --- FIXES START HERE ---
+        state.allQuestions = qData; // Use qData, not data
+        state.currentSubIndex = 0;
+        state.currentQIndex = 0;
         
-        // 5. Initialize Exam UI
-        renderTabs();
-        renderQuestion();
-        startTimer(); // Ensure this function exists!
-        
-    } catch (err) {
-        console.error("Start Exam Error:", err);
-        alert("Failed to start exam. Check console for details.");
-        startBtn.disabled = false;
-        startBtn.innerText = "START EXAMINATION NOW";
+        // Default to 120 minutes (7200 seconds) if not provided by server
+        state.timeLeft = 120 * 60; 
+
+        // Switch the view to the exam page
+        switchPage('instructionsPage', 'examPage');
+
+        // Render UI Components
+        renderTabs();       
+        renderQuestion();   
+        renderGrid();       
+        startTimer();
+        // --- FIXES END HERE ---
+
+    } catch (e) {
+        console.error(e);
+        alert("Initialization Error: " + e.message);
+        proceedBtn.disabled = false;
+        proceedBtn.innerText = "Start Examination";
     }
 }
+  
+    
+    function renderQuestion() {
+    // 1. Safety check: Ensure questions are loaded
+    if (!state.allQuestions || state.allQuestions.length === 0) return;
+    
+    const subjectData = state.allQuestions[state.currentSubIndex];
+    if (!subjectData || !subjectData.questions) return;
+    
+    const q = subjectData.questions[state.currentQIndex];
+    if (!q) return;
+
+    const area = document.getElementById('questionArea');
+
+    // 2. Build the Header (Subject and Question Number)
+  //  const subLabel = q.subsubtopic && !q.passageText ? ` — ${q.subsubtopic}` : "";
+    
+    let html = `
+        <div class="q-meta" style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:bold; color:var(--primary);">
+            <span>${subjectData.subject}</span>
+            <span>Question ${state.currentQIndex + 1} of ${subjectData.questions.length}</span>
+        </div>
+    `;
+
+    // 3. Handle Passages (Fixed size box within the scrollable area)
+    if (q.passageText || q.passage) {
+        html += `<div class="passage-box" style="background:#fffbe6; padding:15px; border-radius:8px; margin-bottom:20px; border-left:4px solid #facc15; max-height:150px; overflow-y:auto; font-style:italic;">
+                    <strong>Passage:</strong><br>${q.passageText || q.passage}
+                 </div>`;
+    }
+
+    // 4. Question Text
+    html += `<div class="question-text" style="font-size:1.1rem; margin-bottom:20px; line-height:1.5;">${q.questionText}</div>`;
+
+    // 5. Options Area (Fancy Row Selection)
+    html += `<div class="options-container">`;
+    const letters = ['A', 'B', 'C', 'D', 'E'];
+    
+    q.options.forEach((opt, index) => {
+        // Check if this option is the one the student already selected
+        const isSelected = state.answers[q._id] === opt.key;
+        
+        html += `
+            <div class="option ${isSelected ? 'selected' : ''}" onclick="saveAnswer('${q._id}', '${opt.key}')">
+                <div class="opt-key">${letters[index]}</div>
+                <div class="opt-text">${opt.value}</div>
+            </div>
+        `;
+    });
+    html += `</div>`;
+
+    // Update the DOM
+    area.innerHTML = html;
+    
+    // Reset scroll position to top whenever a new question is loaded
+    area.scrollTop = 0;
+
+    // 6. Refresh Grid and MathJax
+    if (typeof renderGrid === "function") renderGrid();
+    if (window.MathJax) MathJax.typesetPromise();
+}
+
+function renderGrid() {
+        const grid = document.getElementById('questionGrid');
+        const qs = state.allQuestions[state.currentSubIndex].questions;
+        grid.innerHTML = qs.map((q, i) => {
+            let status = "";
+            if (i === state.currentQIndex) status = "current";
+            else if (state.answers[q._id]) status = "answered";
+            return `<div class="q-circle ${status}" onclick="jumpTo(${i})">${i + 1}</div>`;
+        }).join('');
+    }
     
 
+    // --- NAVIGATION & UTILS ---
+    function switchPage(oldId, newId) {
+        document.getElementById(oldId).classList.add('hidden');
+        document.getElementById(newId).classList.remove('hidden');
+    }
+
+    function Instructions() { switchPage('dashboardPage', 'instructionsPage'); }
+function saveAnswer(qId, key) {
+    state.answers[qId] = key;
+    renderQuestion(); 
+
+    // Reset the 2-second timer every time a user clicks
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(autoSaveToServer, 2000);
+}
+
+function switchSubject(i) {
+    // Update time for the subject we are leaving
+    const now = Date.now();
+    const prevSubName = state.allQuestions[state.currentSubIndex].subject;
+    const elapsed = Math.floor((now - state.lastTabSwitch) / 1000);
+    state.subjectTime[prevSubName] = (state.subjectTime[prevSubName] || 0) + elapsed;
+
+    state.currentSubIndex = i;
+    state.currentQIndex = 0;
+    state.lastTabSwitch = now; // Reset timer for new subject
+    
+    renderTabs();
+    renderQuestion();
+    
+    // Immediate save on subject switch to be safe
+    autoSaveToServer();
+}
+
+
     function renderTabs() {
-        const container = document.getElementById('subjectTabs');
-        container.innerHTML = state.allQuestions.map((item, idx) => `
-            <div class="tab ${idx === state.currentSubIndex ? 'active-tab' : ''}" onclick="switchSubject(${idx})">
-                ${item.subject}
+        const tabsContainer = document.getElementById('subjectTabs');
+        tabsContainer.innerHTML = state.allQuestions.map((sub, i) => `
+            <div class="tab ${i === state.currentSubIndex ? 'active-tab' : ''}" onclick="switchSubject(${i})">
+                ${sub.subject}
             </div>
         `).join('');
     }
 
-    function switchSubject(idx) {
-        state.currentSubIndex = idx;
-        state.currentQIndex = 0;
-        renderTabs();
-        renderQuestion();
-    }
+    async function autoSaveToServer() {
+    // Update time spent on current subject before sending
+    const now = Date.now();
+    const currentSubName = state.allQuestions[state.currentSubIndex].subject;
+    const elapsed = Math.floor((now - state.lastTabSwitch) / 1000);
+    state.subjectTime[currentSubName] = (state.subjectTime[currentSubName] || 0) + elapsed;
+    state.lastTabSwitch = now;
 
-    function renderQuestion() {
-        const subjectData = state.allQuestions[state.currentSubIndex];
-        if (!subjectData || !subjectData.questions.length) {
-            document.getElementById('questionArea').innerHTML = "No questions found for this subject.";
-            return;
-        }
+    const payload = preparePayload("active");
 
-        const q = subjectData.questions[state.currentQIndex];
-        const questionArea = document.getElementById('questionArea');
-
-        let html = `
-            <small>Subject: ${subjectData.subject} | Question ${state.currentQIndex + 1}</small>
-            <div style="font-size: 1.2rem; margin: 20px 0;">${q.questionText}</div>
-        `;
-
-        if(q.questionImage) {
-            html += `<img src="${q.questionImage}" style="max-width:100%; height:auto; margin-bottom:15px; border-radius:5px;">`;
-        }
-
-        q.options.forEach(opt => {
-            const isSelected = state.answers[q._id] === opt.key;
-            html += `
-                <div class="option ${isSelected ? 'selected' : ''}" onclick="saveAnswer('${q._id}', '${opt.key}')">
-                    <span class="opt-key">${opt.key}</span>
-                    <span>${opt.value}</span>
-                    ${opt.optionImage ? `<br><img src="${opt.optionImage}" style="max-height:100px; margin-top:5px;">` : ''}
-                </div>
-            `;
-        });
-
-        questionArea.innerHTML = html;
-        renderGrid();
-        
-        // Trigger MathJax to render any LaTeX
-        if (window.MathJax) MathJax.typesetPromise();
-    }
-
-    function renderGrid() {
-        const questions = state.allQuestions[state.currentSubIndex].questions;
-        const grid = document.getElementById('questionGrid');
-        grid.innerHTML = questions.map((q, i) => `
-            <div class="q-circle ${state.answers[q._id] ? 'answered' : ''} ${i === state.currentQIndex ? 'current' : ''}" 
-                 onclick="jumpTo(${i})">${i + 1}</div>
-        `).join('');
-    }
-
-    async function saveAnswer(qId, key) {
-        state.answers[qId] = key;
-        renderQuestion();
-        
-        // Silent background save
-        try {
-            await fetch(`${BASE_URL}/save-answer`, {
-                method: "POST",
-                headers: {"Content-Type":"application/json"},
-                body: JSON.stringify({ examId: state.examId, questionId: qId, selectedOptionKey: key })
-            });
-        } catch (e) { console.error("Auto-save failed", e); }
-    }
-
-    function jumpTo(i) { state.currentQIndex = i; renderQuestion(); }
-    
-    function nextQuestion() { 
-        if(state.currentQIndex < state.allQuestions[state.currentSubIndex].questions.length - 1) {
-            state.currentQIndex++; renderQuestion();
-        }
-    }
-    
-    function prevQuestion() {
-        if(state.currentQIndex > 0) {
-            state.currentQIndex--; renderQuestion();
-        }
-    }
-
-    function startTimer() {
-        const timerEl = document.getElementById('timer');
-        state.timerInterval = setInterval(() => {
-            state.timeLeft--;
-            if(state.timeLeft <= 0) {
-                clearInterval(state.timerInterval);
-                autoSubmit();
-            }
-            let h = Math.floor(state.timeLeft / 3600);
-            let m = Math.floor((state.timeLeft % 3600) / 60);
-            let s = state.timeLeft % 60;
-            timerEl.innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        }, 1000);
-    }
-
-    async function confirmSubmit() {
-        if(!confirm("Are you sure you want to end the exam?")) return;
-        submitProcess();
-    }
-
-    async function autoSubmit() {
-        alert("Time is up! Your exam is being submitted automatically.");
-        submitProcess();
-    }
-
-    async function submitProcess() {
-    // Show a "Processing Result..." overlay so user doesn't click away
-    showLoadingOverlay(true); 
-    
     try {
-        const res = await fetch(`${BASE_URL}/submit-exam`, {
+        // Using your existing submission route
+        await fetch(`${BASE_URL}/api/exams/submit-exam`, {
             method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({ 
-                examId: state.examId,
-                finalTimeLeft: state.timeLeft // Pass this for analytics
-            })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
         });
-
-        if (!res.ok) throw new Error("Server rejected submission");
-
-        const result = await res.json();
-        showResults(result);
-    } catch (e) {
-        alert("Submission Error: Your answers are safe, but we couldn't calculate the score. Please contact the Admin.");
-    } finally {
-        showLoadingOverlay(false);
+        console.log("Progress auto-saved...");
+    } catch (err) {
+        console.error("Auto-save failed:", err);
     }
 }
+
+    function switchPage(oldId, newId) {
+        document.getElementById(oldId).classList.add('hidden');
+        document.getElementById(newId).classList.remove('hidden');
+    }
+
+    // --- CALCULATOR LOGIC ---
+    function toggleCalculator() { document.getElementById('calc-widget').classList.toggle('hidden'); }
+    function calcInput(v) { document.getElementById('calcScreen').value += v; }
+    function calcClear() { document.getElementById('calcScreen').value = ''; }
+  function calcSolve() {
+    try {
+        let expression = document.getElementById('calcScreen').value;
+        
+        // Count parentheses and close them automatically if student forgot
+        const openP = (expression.match(/\(/g) || []).length;
+        const closeP = (expression.match(/\)/g) || []).length;
+        for (let i = 0; i < (openP - closeP); i++) {
+            expression += ')';
+        }
+
+        let result = eval(expression);
+        
+        // Handle precision and display
+        if (result === Infinity || isNaN(result)) throw new Error();
+        document.getElementById('calcScreen').value = Number.isInteger(result) ? result : parseFloat(result.toFixed(5));
+    } catch {
+        document.getElementById('calcScreen').value = 'Error';
+        setTimeout(calcClear, 1000); // Clear error after 1 second
+    }
+}
+    
+    // Function to handle scientific operations
+function calcSci(op) {
+    let screen = document.getElementById('calcScreen');
+    let val = parseFloat(screen.value);
+    
+    if (isNaN(val)) return;
+
+    switch(op) {
+        case 'sin': screen.value = Math.sin(val * Math.PI / 180).toFixed(4); break; // Degree mode
+        case 'cos': screen.value = Math.cos(val * Math.PI / 180).toFixed(4); break;
+        case 'tan': screen.value = Math.tan(val * Math.PI / 180).toFixed(4); break;
+        case 'log': screen.value = Math.log10(val).toFixed(4); break;
+        case 'sqrt': screen.value = Math.sqrt(val).toFixed(4); break;
+    }
+}
+
+// Decimal to Fraction Converter (Simplified)
+function toggleFraction() {
+    let screen = document.getElementById('calcScreen');
+    let val = screen.value;
+
+    if (val.includes('/')) {
+        // Convert Frac to Dec
+        let parts = val.split('/');
+        screen.value = (parseFloat(parts[0]) / parseFloat(parts[1])).toFixed(4);
+    } else {
+        // Convert Dec to Frac
+        let decimal = parseFloat(val);
+        if (isNaN(decimal)) return;
+        
+        let len = decimal.toString().length - 2;
+        let denominator = Math.pow(10, len);
+        let numerator = decimal * denominator;
+        
+        // Simple simplification (Greatest Common Divisor)
+        const gcd = (a, b) => b ? gcd(b, a % b) : a;
+        let common = gcd(numerator, denominator);
+        
+        screen.value = `${numerator / common}/${denominator / common}`;
+    }
+}
+
+// Modify your calcSolve slightly to handle power inputs (**)
+function calcSolve() {
+    try {
+        let expression = document.getElementById('calcScreen').value;
+        // Basic sanitization
+        let result = eval(expression);
+        document.getElementById('calcScreen').value = Number.isInteger(result) ? result : result.toFixed(4);
+    } catch {
+        document.getElementById('calcScreen').value = 'Error';
+    }
+}
+
+    // Timer & Other nav functions (prev/next/grid) remain standard...
+
+    function jumpTo(index) {
+    state.currentQIndex = index;
+    renderQuestion();
+}
+
+function nextQuestion() {
+    const totalQs = state.allQuestions[state.currentSubIndex].questions.length;
+    if (state.currentQIndex < totalQs - 1) {
+        state.currentQIndex++;
+    } else if (state.currentSubIndex < state.allQuestions.length - 1) {
+        // Jump to next subject
+        state.currentSubIndex++;
+        state.currentQIndex = 0;
+        renderTabs();
+    }
+    renderQuestion();
+}
+
+function prevQuestion() {
+    if (state.currentQIndex > 0) {
+        state.currentQIndex--;
+    } else if (state.currentSubIndex > 0) {
+        // Jump to previous subject
+        state.currentSubIndex--;
+        // Set to the LAST question of that subject
+        state.currentQIndex = state.allQuestions[state.currentSubIndex].questions.length - 1;
+        renderTabs(); // Update the UI tab highlight
+    }
+    renderQuestion();
+}
+
+function startTimer() {
+    if (state.timerInterval) clearInterval(state.timerInterval);
+    state.timerInterval = setInterval(() => {
+        state.timeLeft--;
+        
+        // Update the timer display
+        const h = Math.floor(state.timeLeft / 3600).toString().padStart(2, '0');
+        const m = Math.floor((state.timeLeft % 3600) / 60).toString().padStart(2, '0');
+        const s = (state.timeLeft % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+
+        // Handle Time-Out
+        if (state.timeLeft <= 0) {
+            clearInterval(state.timerInterval);
+            handleFinalSubmission("timed-out");
+        }
+    }, 1000);
+}
+
+// A reusable function for the end of the exam
+async function handleFinalSubmission(finalStatus) {
+    const payload = preparePayload(finalStatus);
+    try {
+        await fetch(`${BASE_URL}/api/exams/submit-exam`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        alert(finalStatus === "timed-out" ? "Time is up! Exam saved." : "Exam Submitted!");
+        window.location.href = "results.html";
+    } catch (err) {
+        console.error("Final submission failed:", err);
+    }
+}
+
+    
+
+    async function confirmSubmit() {
+    if (!confirm("Are you sure you want to end the exam?")) return;
+
+    const payload = preparePayload("submitted");
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/exams/submit-exam`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            alert("Exam Submitted Successfully!");
+            window.location.href = "results.html"; // Redirect to results
+        }
+    } catch (err) {
+        alert("Submission Error: " + err.message);
+    }
+}
+
+    
 
     function showResults(data) {
         document.getElementById('examPage').classList.add('hidden');

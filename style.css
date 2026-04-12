@@ -118,73 +118,7 @@ input, select {
     border-top: 3px solid var(--secondary);
 }
 
-/* Question Area */
-.question-card {
-    background: var(--white);
-    padding: 25px;
-    border-radius: 5px;
-    min-height: 300px;
-    margin-bottom: 5px;
-}
 
-.option {
-    border: 2px solid #eee;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: 0.2s;
-}
-
-.option:hover { background: #f9f9f9; }
-
-.option.selected {
-    border-color: var(--secondary);
-    background: #e8f8f5;
-}
-
-.opt-key {
-    background: #eee;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    margin-right: 15px;
-    font-weight: bold;
-}
-
-/* Navigation Grid */
-.nav-panel {
-    background: var(--white);
-    padding: 15px;
-    border-radius: 5px;
-}
-
-.q-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.q-circle {
-    aspect-ratio: 1;
-    border: 1px solid #ccc;
-    background: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    border-radius: 4px;
-}
-
-.q-circle.answered { background: var(--secondary); color: white; border: none; }
-.q-circle.current { border: 2px solid var(--primary); font-weight: bold; }
 
 /* Results Table */
 table {
@@ -286,4 +220,279 @@ th, td {
 
 #qregBtn {
     transition: background-color 0.3s ease, transform 0.1s active;
+}
+
+
+
+
+/* Status Badges */
+.status-upcoming { 
+    background: #fef3c7; color: #92400e; 
+    padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; 
+}
+.status-active { 
+    background: #dcfce7; color: #166534; 
+    padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; 
+    animation: pulse 2s infinite;
+}
+.status-ended { 
+    background: #f1f5f9; color: #475569; 
+    padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; 
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+/* Dropdown for Student Search */
+.dropdown-list {
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.dropdown-item:hover {
+    background: #f8fafc;
+}
+
+/* Modal Overlay */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2000;
+}
+
+.modal.hidden { display: none; }
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.badge-student {
+    background: #e2e8f0;
+    color: #1e293b;
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    border: 1px solid #cbd5e1;
+    margin-bottom: 5px;
+}
+
+.badge-student span:last-child:hover {
+    color: #b91c1c !important;
+    transform: scale(1.2);
+}
+
+td div small, td div {
+    white-space: nowrap; /* Prevents dates from wrapping awkwardly */
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+.status-upcoming {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+.status-ended {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+
+/** EXAMS **/
+
+/* EXAM INTERFACE CORE */
+
+#examPage {
+    background-color: var(--light-bg);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOP NAVIGATION TABS */
+.subject-tabs {
+    display: flex;
+    background: var(--primary-blue);
+    padding: 10px 15px 0 15px;
+    gap: 5px;
+    overflow-x: auto;
+    border-bottom: 3px solid var(--accent-green);
+}
+
+
+/* MAIN CONTENT LAYOUT */
+.exam-body {
+    display: grid;
+    grid-template-columns: 1fr 300px; /* Main area | Question Grid */
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* PASSAGE BOX (ENGLISH) */
+.passage-container {
+    background: #f1f5f9;
+    border-left: 5px solid var(--primary-blue);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+/* Question Area - Fixed height with internal scroll */
+.question-card {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 8px;
+    height: 60vh; /* Fixed height relative to screen */
+    overflow-y: auto; /* Scrollable vertically */
+    border: 1px solid #ddd;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.02);
+    margin-bottom: 15px;
+}
+
+/* Hide original radio/checkbox inputs if they exist */
+.option input {
+    display: none; 
+}
+
+/* Fancy Row Options */
+.option {
+    border: 2px solid #eee;
+    padding: 16px;
+    margin: 12px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.option:hover {
+    border-color: var(--secondary);
+    background: #f0fdfa;
+}
+
+/* Highlighting the row when selected */
+.option.selected {
+    border-color: var(--primary);
+    background: #e8f8f5;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Stylized Key (A, B, C, D) */
+.opt-key {
+    background: #f1f5f9;
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: 15px;
+    font-weight: 800;
+    color: var(--primary);
+    border: 1px solid #cbd5e1;
+}
+
+.option.selected .opt-key {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Navigation Grid */
+.q-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.q-circle {
+    aspect-ratio: 1;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.q-circle.answered { background: var(--secondary); color: white; border: none; }
+.q-circle.current { border: 2px solid var(--primary); color: var(--primary); background: #f1f5f9; }
+
+/* NAVIGATION FOOTER */
+.exam-footer {
+    padding: 15px 30px;
+    background: #fff;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-nav {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-prev { background: #64748b; color: white; }
+.btn-next { background: var(--primary-blue); color: white; }
+.btn-submit { background: #e11d48; color: white; }
+
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
+    .exam-body {
+        grid-template-columns: 1fr;
+    }
+    
 }

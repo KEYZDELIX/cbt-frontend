@@ -172,85 +172,154 @@
         
     </aside>
 
-    <main class="main-content">
-        
-        <section id="addUsers" class="tab-content">
+    <main class="main-content"><section id="addUsers" class="tab-content">
     <div class="card">
-        <h3>Student Enrollment</h3>
-        <div class="form-grid">
-            <div class="input-group">
-                <label>First Name <button type="button" class="tool-btn-small" onclick="clearField('uFirst')">Clear</button></label>
-                <input type="text" id="uFirst" placeholder="John">
-            </div>
-            <div class="input-group">
-                <label>Middle Name <button type="button" class="tool-btn-small" onclick="clearField('uMiddle')">Clear</button></label>
-                <input type="text" id="uMiddle" placeholder="Optional">
-            </div>
-            <div class="input-group">
-                <label>Last Name <button type="button" class="tool-btn-small" onclick="clearField('uLast')">Clear</button></label>
-                <input type="text" id="uLast" placeholder="Doe">
-            </div>
-
-            <div class="input-group">
-                <label>Gender</label>
-                <select id="uGender">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" id="uEmail" placeholder="student@example.com">
-            </div>
-            <div class="input-group">
-                <label>Phone</label>
-                <input type="tel" id="uPhone" placeholder="080...">
-            </div>
-
-            <div class="input-group">
-                <label>Course of Study</label>
-                <input type="text" id="uCourse" placeholder="e.g. Science">
-            </div>
-            <div class="input-group">
-                <label>Class Level</label>
-                <select id="uClass">
-                    <option value="SS1">SS 1</option>
-                    <option value="SS2">SS 2</option>
-                    <option value="SS3">SS 3</option>
-                </select>
-            </div>
-           <div class="input-group">
-    <label>Password/PIN 
-        <button type="button" class="tool-btn-small" onclick="generatePassword()" style="color: #0ea5e9;">Auto-Gen</button>
-        <button type="button" class="tool-btn-small" onclick="clearField('uPass')">Clear</button>
-    </label>
-    <div style="display: flex; gap: 5px;">
-        <input type="text" id="uPass" placeholder="Click Auto-Gen" style="flex: 1;">
-    </div >
-</div>
-
-            <div class="input-group full-width">
-                <label>Select 3 Elective Subjects (English is Auto-added)</label>
-                <select id="uSubs" multiple style="height: 120px; width: 100%;">
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Physics">Physics</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Biology">Biology</option>
-                    <option value="Economics">Economics</option>
-                    <option value="Government">Government</option>
-                    <option value="Literature">Literature</option>
-                    <option value="Geography">Geography</option>
-                    <option value="Agricultural Science">Agricultural Science</option>
-                    <option value="Commerce">Commerce</option>
-                    <option value="Accounting">Accounting</option>
-                    <option value="CRK">CRK</option>
-                    <option value="IRK">IRK</option>
-                </select>
-            </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0;">Student Enrollment</h3>
+            <button class="tool-btn-small" onclick="toggleCard('enrollmentContent', this)">Collapse ▲</button>
         </div>
-        <button class="btn-save" id="regBtn" onclick="registerUser()" style="width: 100%; margin-top: 20px;">Create Account</button>
+        
+        <div id="enrollmentContent">
+            <div class="form-grid" style="margin-top: 15px;">
+                <div class="input-group">
+                    <label>First Name <button type="button" class="tool-btn-small" onclick="clearField('uFirst')">Clear</button></label>
+                    <input type="text" id="uFirst" placeholder="John">
+                </div>
+                <div class="input-group">
+                    <label>Middle Name <button type="button" class="tool-btn-small" onclick="clearField('uMiddle')">Clear</button></label>
+                    <input type="text" id="uMiddle" placeholder="Optional">
+                </div>
+                <div class="input-group">
+                    <label>Last Name <button type="button" class="tool-btn-small" onclick="clearField('uLast')">Clear</button></label>
+                    <input type="text" id="uLast" placeholder="Doe">
+                </div>
+
+                <div class="input-group">
+                    <label>Gender</label>
+                    <select id="uGender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="uEmail" placeholder="student@example.com">
+                </div>
+                <div class="input-group">
+                    <label>Phone</label>
+                    <input type="tel" id="uPhone" placeholder="080...">
+                </div>
+
+                <div class="input-group">
+                    <label>Course of Study</label>
+                    <input type="text" id="uCourse" placeholder="e.g. Science">
+                </div>
+                <div class="input-group">
+                    <label>Class Level</label>
+                    <select id="uClass">
+                        <option value="SS1">SS 1</option>
+                        <option value="SS2">SS 2</option>
+                        <option value="SS3">SS 3</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Password/PIN 
+                        <button type="button" class="tool-btn-small" onclick="generatePassword()" style="color: #0ea5e9;">Auto-Gen</button>
+                    </label>
+                    <input type="text" id="uPass" placeholder="Click Auto-Gen">
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Select Elective Subjects (English is Auto-added)</label>
+                    <select id="uSubs" multiple style="height: 120px; width: 100%;">
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Biology">Biology</option>
+                        <option value="Economics">Economics</option>
+                        <option value="Government">Government</option>
+                        <option value="Literature">Literature</option>
+                        <option value="Geography">Geography</option>
+                        <option value="Agricultural Science">Agricultural Science</option>
+                        <option value="Commerce">Commerce</option>
+                        <option value="Accounting">Accounting</option>
+                        <option value="CRK">CRK</option>
+                        <option value="IRK">IRK</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-save" id="regBtn" onclick="registerUser()" style="width: 100%; margin-top: 20px;">Create Account</button>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+<h3>View Registered Users <span id="userCountBadge" style="font-size: 0.9rem;
+background: #0ea5e9; color: white; padding: 2px 8px; border-radius: 12px;
+margin-left: 10px;">0</span></h3>
+            <button class="tool-btn-small" onclick="toggleCard('userListContent', this)">Expand ▼</button>
+        </div>
+        
+       <div id="userListContent" class="hidden" style="margin-top: 15px; overflow-x: auto;">
+         <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;">
+    <div class="input-group" style="flex: 1; min-width: 200px;">
+        <label style="font-size: 0.8rem;">Search Name/RegNo</label>
+        <input type="text" id="userSearch" placeholder="Search..."
+        onkeyup="loadUsers()" style="padding: 8px;">
+    </div>
+    <div class="input-group">
+        <label style="font-size: 0.8rem;">Level</label>
+        <select id="filterLevel" onchange="loadUsers()">
+            <option value="">All Levels</option>
+            <option value="SS1">SS 1</option>
+            <option value="SS2">SS 2</option>
+            <option value="SS3">SS 3</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label style="font-size: 0.8rem;">Gender</label>
+        <select id="filterGender" onchange="loadUsers()">
+            <option value="">All</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label style="font-size: 0.8rem;">Course</label>
+        <input type="text" id="filterCourse" placeholder="Filter Course"
+        onkeyup="loadUsers()" style="padding: 8px; width: 120px;">
+    </div>
+    <button onclick="loadUsers()" class="tool-btn-small" style="height: 38px; background: #0ea5e9; color: white; border: none;">🔄 Refresh</button>
+</div>
+    <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem; white-space: nowrap;">
+        <thead>
+            <tr style="background: #f1f5f9; text-align: left;">
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">S/N</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Full Name</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Reg No</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">PIN (Plain)</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Password (Hash)</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Gender</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Email</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Phone</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Course</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Level</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Subjects</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Date Registered</th>
+<th style="padding: 10px; border: 1px solid #e2e8f0;">Last Updated</th>
+<th style="padding: 10px; border: 1px solid #e2e8f0;">Last Login</th>
+                <th style="padding: 10px; border: 1px solid
+                #e2e8f0;">Exam History</th>
+                <th style="padding: 10px; border: 1px solid #e2e8f0;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="userTableBody">
+            </tbody>
+    </table>
+</div>
     </div>
 </section>
+        
 
         <section id="addQuestions" class="tab-content hidden">
             <div class="card">
@@ -258,17 +327,41 @@
                 <div class="form-grid">
                     <div class="input-group">
                         <label>Subject</label>
-                        <select id="qSubject" onchange="fetchTopicsBySubject()">
+                        <select id="qSubject" onchange="handleSubjectChange()">
                             <option>Use of English</option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Economics</option><option>Government</option><option>Literature</option><option>CRK</option><option>IRK</option><option>Accounting</option><option>Commerce</option><option>Agricultural Science</option><option>Geography</option>
                         </select>
                     </div>
-                    <div class="input-group">
-    <label>Topic 
-        <span id="topicStatus" style="font-size: 0.75rem; font-weight: normal; margin-left: 10px; color: #64748b;"></span>
-    </label>
-    <input type="text" id="qTopic" list="topicList" oninput="handleTopicInput()" placeholder="Start typing a topic...">
-    <datalist id="topicList"></datalist>
-</div>
+    <div id="standardTopicGroup" class="input-group">
+        <label>Topic <span id="topicStatus" style="font-size: 0.75rem; color: #64748b;"></span></label>
+        <input type="text" id="qTopic" list="topicList" oninput="handleTopicInput()" placeholder="Start typing a topic...">
+        <datalist id="topicList"></datalist>
+    </div>
+    
+    <div id="englishTopicGroup" style="display:none; gap: 10px; grid-column: span 2;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; width:100%;">
+            <div class="input-group">
+                <label>Section (Topic)</label>
+                <select id="engSection" onchange="updateEngSubtopics()">
+                    <option value="">Select Section</option>
+                    <option value="Section A: Comprehension and Summary">Section A: Comprehension</option>
+                    <option value="Section B: Lexis and Structure">Section B: Lexis & Structure</option>
+                    <option value="Section C: Oral Forms">Section C: Oral Forms</option>
+                </select>
+            </div>
+            <div class="input-group">
+            <label>Type (Subtopic) <span id="engSubtopicStatus" style="font-size: 0.7rem;"></span></label>
+            <select id="engSubtopic" onchange="handleEngSubtopicChange()"></select>
+        </div>
+
+        <div class="input-group">
+            <label>Group (Sub-subtopic) <span id="engSubSubStatus" style="font-size: 0.7rem;"></span></label>
+            <input type="text" id="engSubSub" list="engSubSubList" oninput="handleEnglishSubSubInput()" placeholder="Passage Name...">
+            <datalist id="engSubSubList"></datalist>
+        </div>
+<datalist id="engSubSubList"></datalist>
+            </div>
+        </div>
+    
 <div id="topicManagerModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; display:none; align-items:center; justify-content:center; backdrop-filter: blur(8px);">
     <div style="background:white; padding:30px; border-radius:20px; width:90%; max-width:500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
         <h3 style="margin-top:0; color:#1e293b;">Topic Manager</h3>
@@ -300,6 +393,28 @@
         <div id="statsList" style="max-height: 150px; overflow-y: auto; font-size: 13px;">
             </div>
     </div>
+</div>
+<div id="passageContainer" style="display:none; margin-top:20px; border: 2px solid #e2e8f0; padding: 15px; border-radius: 12px; background: #fff;">
+    <label style="font-weight: bold; color: #1e293b; display: block; margin-bottom: 8px;">
+        📖 Passage / Context Text 
+    </label>
+    
+    <div class="toolbar">
+       <button type="button" class="tool-btn" id="qPBold"
+       onclick="formatPassage('bold', 'qPBold')">B</button>
+    <button type="button" class="tool-btn" id="qPItal"
+    onclick="formatPassage('italic', 'qPItal')">I</button>
+    <button type="button" class="tool-btn" id="qPUnder"
+    onclick="formatPassage('underline', 'qPUnder')"><u>U</u></button>
+    <button type="button" class="tool-btn" onclick="insertMath()">\(\Sigma\)</button> 
+        <button type="button" class="tool-btn" onclick="clearField('qPassage')" style="cursor:pointer; font-size:10px;">Clear</button>
+    </div>
+
+    <div id="qPassage" contenteditable="true" 
+       onkeyup="checkPassageFormat('qPBold','qPItal','qPUnder')"  oninput="updateFullPreview()"
+         style="border:1px solid #cbd5e1; min-height:150px; padding:12px; border-radius:8px; background: #f8fafc; overflow-y: auto;">
+    </div>
+    <small style="color: #64748b;">Paste the story or cloze passage here. This is saved separately from the question.</small>
 </div>
 
 <div class="input-group full-width">
@@ -379,16 +494,17 @@
                 <button class="btn-save" id="qregBtn" style="margin-top:20px;" onclick="saveQuestion()">Save Question</button>
                 
                 
-               <!-- <div id="previewArea" style="margin-top: 30px; padding: 20px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;">
-                    <strong style="color: #92400e;">Live Question Preview:</strong>
-                    <div id="mathPreview" style="margin-top: 10px;"></div>
-                </div>  -->
                 <div id="fullPreviewContainer" style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 12px; margin-top: 20px;">
     <h4 style="margin-top:0; color:#64748b;">Live Exam Preview</h4>
+    <div id="pPassage" style="display:none; max-height: 200px; overflow-y: auto;
+    background: #f8fafc; padding: 10px; border-left: 4px solid #0ea5e9;
+    margin-bottom: 15px; font-style: italic; font-size: 0.9rem;"></div>
+    <div id="pQuestionImage" style="margin-bottom: 10px; text-align: center;"></div>
+    
     <div id="pQuestion" style="font-weight: bold; margin-bottom: 15px; font-size: 1.1rem;"></div>
-    <div id="pOptions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        </div>
+    <div id="pOptions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
 </div>
+
 </div>
  </section>
  
@@ -398,7 +514,7 @@
         
         <div class="filter-bar" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
             <select id="manageSubFilter" onchange="loadQuestions()" style="flex: 1; min-width: 150px; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
-                <option value="">All Subjects</option></option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Economics</option><option>Government</option><option>Literature</option><option>CRK</option><option>IRK</option><option>Accounting</option><option>Commerce</option><option>Agricultural Science</option><option>Geography</option>
+                <option value="">All Subjects</option><option>Use of English</option></option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Economics</option><option>Government</option><option>Literature</option><option>CRK</option><option>IRK</option><option>Accounting</option><option>Commerce</option><option>Agricultural Science</option><option>Geography</option>
                 
             </select>
             <input type="text" id="manageSearch" 
@@ -431,81 +547,141 @@
  
  
 
-       <section id="manageExams" class="tab-content hidden">
+      <section id="manageExams" class="tab-content hidden">
     <div class="card">
         <h3 id="examFormTitle">Exam Configuration</h3>
-        <input type="hidden" id="editExamId"> <div class="form-grid">
+        <input type="hidden" id="editExamId">
+        
+        <div class="form-grid">
+            
             <div class="input-group">
                 <label>Exam Title</label>
-                <input type="text" id="exTitle" placeholder="e.g. 2026 Mock Exam">
+                <input type="text" id="exTitle" placeholder="e.g. 2026 UTME Mock">
             </div>
             <div class="input-group">
-                <label>Duration (Minutes)</label>
+    <label>Total Questions (Global)</label>
+    <input type="number" id="exTotalQty" value="100" placeholder="e.g. 180">
+</div>
+            <div class="input-group">
+                <label>Duration (Mins)</label>
                 <input type="number" id="exTime" value="60">
             </div>
             <div class="input-group">
-                <label>Shuffle Settings</label>
-                <select id="exShuffle">
-                    <option value="both">Shuffle Questions & Options</option>
-                    <option value="questions">Shuffle Questions Only</option>
-                    <option value="none">Fixed Order</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Maximum Attempts</label>
+                <label>Max Attempts</label>
                 <input type="number" id="exAttempts" value="1">
             </div>
             <div class="input-group">
-                <label>Status</label>
-                <select id="exStatus">
-                    <option value="active">Active</option>
-                    <option value="closed">Closed/Disabled</option>
+                <label>Shuffle Type</label>
+                <select id="exShuffle">
+                    <option value="smart">Smart (Topic-wise English)</option>
+                    <option value="both">Shuffle All</option>
+                    <option value="none">Fixed</option>
                 </select>
             </div>
-
-            <div class="input-group full-width" style="border-top: 1px solid #eee; pt-15;">
-                <label>Assign Students (Group or Individual)</label>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <select id="groupSelect" style="flex: 2;">
-                        <option value="">-- Add by Class --</option>
-                        <option value="SS1">SS 1 Students</option>
-                        <option value="SS 2">SS 2 Students</option>
-                        <option value="SS 3">SS 3 Students</option>
-                    </select>
-                    <button type="button" class="tool-btn" onclick="addStudentsByGroup()" style="flex: 1;">Add Group</button>
-                </div>
-                
-                <input type="text" id="stuSearch" oninput="searchStudents()" placeholder="Search Name or Reg No...">
-                <div id="stuBadgeContainer" class="tag-container" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;">
-                    </div>
+            <div class="input-group">
+                <label>General Start</label>
+                <input type="datetime-local" id="exStart">
+            </div>
+            <div class="input-group">
+                <label>General End</label>
+                <input type="datetime-local" id="exEnd">
             </div>
         </div>
 
-        <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <div class="input-group" style="margin-top:15px;">
+            <label>Batches <span style="font-weight:normal; font-size:0.8rem;">(Each batch gets unique passages)</span></label>
+            <input type="number" id="exBatchCount" value="1" oninput="generateBatchUI()" style="width:100px;">
+        </div>
+        <div id="batchContainer" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:15px 0;"></div>
+
+        <div style="background: #f8fafc; padding:15px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="font-weight:bold;">Question Pool Distribution</label>
+                <button type="button" class="tool-btn" onclick="openEngModal()">Set English Topics</button>
+            </div>
+            <div id="engDistModal" class="modal hidden">
+    <div class="modal-content" style="max-width:550px; border-radius:15px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);">
+        <h3 style="margin-bottom:5px;">English Question Distribution</h3>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:15px;">Specify how many questions to pull from each subtopic for this exam pool.</p>
+        
+        <div id="engTopicList" style="max-height:350px; overflow-y:auto; padding-right:5px;">
+            </div>
+
+        <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; pt-15; border-top:1px solid #e2e8f0;">
+            <span id="totalEngCount" style="font-weight:bold; font-size:1rem;">Total Selected: 0 / 60</span>
+            <div style="display:flex; gap:10px;">
+                <button type="button" class="btn-clear" onclick="closeEngModal()" style="background:#94a3b8;">Cancel</button>
+                <button type="button" class="btn-save" onclick="applyEngDist()">Confirm Distribution</button>
+            </div>
+        </div>
+    </div>
+</div>
+            <div id="distSummary" style="font-size:0.8rem; color:#64748b; margin-top:5px;">No distribution set. Defaulting to random.</div>
+        </div>
+        
+        <div class="input-group">
+    <label>Assign Students by Class/Group</label>
+    <div style="display:flex; gap:10px;">
+        <select id="groupSelect" style="flex:1;">
+            <option value="">-- Select Class --</option>
+            <option value="SS1">SS1</option>
+            <option value="SS2">SS2</option>
+            <option value="SS3">SS3</option>
+        </select>
+        <button type="button" class="tool-btn" onclick="addStudentsByGroup()">Add Group</button>
+    </div>
+</div>
+        
+        <div class="input-group full-width">
+            <label>Assign Students by Search</label>
+            <div style="position:relative;">
+                <input type="text" id="stuSearch" oninput="searchStudents()" placeholder="Search Name/RegNo...">
+                <div id="searchDropdown" class="dropdown-list"></div>
+            </div>
+            <div id="stuBadgeContainer" class="tag-container"></div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:10px;">
             <button id="saveExamBtn" class="btn-save" onclick="saveExamSettings()">Create Exam</button>
-            <button id="cancelEditBtn" class="btn-clear" onclick="resetExamForm()" style="display:none; background:#64748b;">Cancel Edit</button>
+            <button class="btn-clear" onclick="resetExamForm()">Reset</button>
         </div>
     </div>
 
-    <div class="card" style="margin-top: 20px;">
-        <h3>Existing Exams</h3>
+    <div class="card" style="margin-top:20px;">
+        <h3>Existing Exams 
+    <button class="tool-btn" onclick="loadExams()" style="font-size:0.7rem; margin-left:10px;">Refresh List</button>
+</h3>
         <div style="overflow-x: auto;">
-            <table style="width:100%; text-align: left; border-collapse: collapse;">
-                <thead style="background: #f8fafc;">
+            <table class="admin-table">
+                <thead>
                     <tr>
-                        <th style="padding:12px;">Exam Title</th>
-                        <th>Students</th>
+                        <th style="padding:12px;">S/N</th>
+                        <th>Exam Title & Batches</th>
+                        <th>Target Students</th>
+                        <th>Qty / Time</th>
+                        <th>Attempts / Shuffle</th>
+                        <th>Date Created / Updated</th>
                         <th>Status</th>
-                        <th>Last Updated</th>
-                        <th>Action</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="examTableBody">
-                    </tbody>
+                <tbody id="examTableBody"></tbody>
             </table>
         </div>
     </div>
 </section>
+
+<div id="engDistModal" class="modal hidden">
+    <div class="modal-content" style="max-width:500px;">
+        <h3>English Topic Distribution</h3>
+        <p>Set how many questions per topic/section:</p>
+        <div id="engTopicList" style="max-height:300px; overflow-y:auto; padding:10px;"></div>
+        <div style="margin-top:15px; display:flex; justify-content:flex-end; gap:10px;">
+            <button class="btn-clear" onclick="closeEngModal()">Cancel</button>
+            <button class="btn-save" onclick="applyEngDist()">Apply Settings</button>
+        </div>
+    </div>
+</div>
 
         <section id="results" class="tab-content hidden">
             <div class="card">
@@ -624,6 +800,36 @@
     </div>
 </div>
 
+<div id="deleteConfirmModal" class="modal hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+    <div style="background: white; padding: 25px; border-radius: 12px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+        <div style="color: #ef4444; font-size: 3rem; margin-bottom: 10px;">⚠️</div>
+        <h3 style="margin-top: 0; color: #1e293b;">Confirm Delete</h3>
+        <p id="deleteModalMsg" style="color: #64748b; line-height: 1.5;">Are you sure you want to delete this question? This action cannot be undone.</p>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="closeDeleteModal()" style="flex: 1; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer;">Cancel</button>
+            <button id="confirmDeleteBtn" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: #ef4444; color: white; cursor: pointer; font-weight: bold;">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+<div id="userDeleteModal" class="modal hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000;">
+    <div style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+        <div style="background: #fee2e2; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+            <span style="color: #ef4444; font-size: 1.5rem;">🗑️</span>
+        </div>
+        <h3 style="margin: 0; color: #1e293b; font-size: 1.25rem;">Delete Student?</h3>
+        <p id="userDeleteMsg" style="color: #64748b; margin-top: 10px; line-height: 1.5; font-size: 0.95rem;">
+            Are you sure you want to delete this student?
+        </p>
+        
+        <div style="display: flex; gap: 12px; margin-top: 25px;">
+            <button onclick="closeUserDeleteModal()" style="flex: 1; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: white; cursor: pointer; font-weight: 500;">Cancel</button>
+            <button id="confirmUserDeleteBtn" style="flex: 1; padding: 12px; border: none; border-radius: 10px; background: #ef4444; color: white; cursor: pointer; font-weight: 600;">Delete Account</button>
+        </div>
+    </div>
+</div>
+
 
 
 <div id="examSuccessModal" class="modal-overlay hidden">
@@ -651,6 +857,26 @@
     </div>
 </div>
 
+<div id="resetModal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3>Manage Exam Progress</h3>
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">
+            Select students to clear their attempts, or use "Reset All".
+        </p>
+        
+        <div id="studentResetList" style="max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 15px;">
+            </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; pt-15;">
+            <button class="tool-btn" style="background:#ef4444; color:white;" onclick="processReset('all')">Reset ALL Students</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-clear" onclick="closeResetModal()">Close</button>
+                <button class="btn-save" onclick="processReset('selected')">Reset Selected</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-------FRONTEND SCRIPT----->
 
 <script>
@@ -666,12 +892,14 @@ function stageImage(input, key) {
         const targetId = (key === 'question') ? 'qImgInput' : `opt${key}Img`;
         const inputField = document.getElementById(targetId);
         if (inputField) inputField.value = "📍 Selected: " + input.files[0].name;
+        updateFullPreview();
     }
 }
     
     
 //----TABS-------
 function showTab(tabId, element = null) {
+  handleSubjectChange();
     // 1. Hide all tab contents
     document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
     
@@ -709,112 +937,453 @@ function showTab(tabId, element = null) {
   async function registerUser() {
     const btn = document.getElementById('regBtn');
     
+    // 1. Gather Payload
     const payload = {
-        firstName: document.getElementById('uFirst').value,
-        middleName: document.getElementById('uMiddle').value,
-        lastName: document.getElementById('uLast').value,
+        firstName: document.getElementById('uFirst').value.trim(),
+        middleName: document.getElementById('uMiddle').value.trim(),
+        lastName: document.getElementById('uLast').value.trim(),
         gender: document.getElementById('uGender').value,
-        email: document.getElementById('uEmail').value,
-        phone: document.getElementById('uPhone').value,
-        courseOfStudy: document.getElementById('uCourse').value,
+        email: document.getElementById('uEmail').value.trim(),
+        phone: document.getElementById('uPhone').value.trim(),
+        courseOfStudy: document.getElementById('uCourse').value.trim(),
         classLevel: document.getElementById('uClass').value,
-        password: document.getElementById('uPass').value,
+        password: document.getElementById('uPass').value, // This is the plain text PIN
         subjects: Array.from(document.getElementById('uSubs').selectedOptions).map(o => o.value)
     };
 
-    // Validation: Exactly 3 electives (to make 4 total with English)
+    // 2. Validation: Exactly 3 electives
     if (!payload.firstName || !payload.lastName || payload.subjects.length !== 3) {
         return alert("Please fill names and select exactly 3 elective subjects.");
     }
 
+    // 3. Determine Mode (Register vs Update)
+    const isUpdating = currentEditingUserId !== null;
+    const url = isUpdating 
+        ? `${BASE_URL}/admin/users/${currentEditingUserId}` 
+        : `${BASE_URL}/admin/register-user`;
+    const method = isUpdating ? "PUT" : "POST";
+
     btn.disabled = true;
-    btn.innerText = "Generating Reg No...";
+    btn.innerText = isUpdating ? "Updating Account..." : "Generating Reg No...";
 
     try {
-        const res = await fetch(`${BASE_URL}/admin/register-user`, {
-            method: "POST",
+        const res = await fetch(url, {
+            method: method,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
 
         const data = await res.json();
+
         if (res.ok) {
-            document.getElementById('modalName').innerText = `$${payload.lastName.toUpperCase()} ${payload.firstName} ${payload.middleName}`;
-            document.getElementById('modalRegNo').innerText = data.regNumber;
-            document.getElementById('modalPass').innerText = data.password;
+            // Show the Modal (Works for both now)
+            document.getElementById('modalName').innerText =
+            `${payload.lastName.toUpperCase()} ${payload.firstName} ${payload.middleName}`;
+            document.getElementById('modalRegNo').innerText = data.regNumber || data.user.regNo;
+            document.getElementById('modalPass').innerText = payload.password || "Unchanged"; // Shows the plain PIN
             document.getElementById('successModal').classList.remove('hidden');
             
-            // Clear all fields
+            // RESET
+            currentEditingUserId = null;
+            document.getElementById('regBtn').innerText = "Create Account";
             ["uFirst", "uMiddle", "uLast", "uEmail", "uPhone", "uCourse", "uPass"].forEach(id => clearField(id));
-            document.getElementById('uSubs').selectedIndex = -1; // Deselect subjects
+            document.getElementById('uSubs').selectedIndex = -1;
+            
+            loadUsers(); // Refresh the list
         } else {
-            alert("Error: " + data.error);
+            alert("Error: " + (data.error || data.message));
         }
     } catch (e) {
+        console.error("Operation failed:", e);
         alert("Server connection failed.");
     } finally {
         btn.disabled = false;
-        btn.innerText = "Create Account";
+        if (!currentEditingUserId) btn.innerText = "Create Account";
     }
 }
 
+
+
+function viewHistory(userId, firstName) {
+  console.log(`Fetching records for: ${firstName} (ID: ${userId})`);
     
-// ----- EXQM CONFIGURATION -----
-async function saveExamSettings() {
-    const payload = {
-        name: document.getElementById('exTitle').value,
-        durationMinutes: document.getElementById('exTime').value,
-        shuffleQuestions: document.getElementById('exShuffle').value !== 'none',
-        shuffleOptions: document.getElementById('exShuffle').value === 'both',
-        maxAttempts: document.getElementById('exAttempts').value, // Make sure this input exists!
-        isActive: document.getElementById('exStatus').value === 'active'
-    };
+    // Switch to your results/history tab
+     //showTab('resultsTab'); 
+    
+    // Apply a filter to your results table
+     //filterResultsByStudent(userId);
+    alert("Fetching exam history for User ID: " + userId + ". This feature is coming in the next update!");
+    // Later we will build the logic to filter the Results tab for this ID.
+}
+
+let currentEditingUserId = null;
+
+// --- LOAD REGISTERED USERS ---
+async function loadUsers() {
+    const tbody = document.getElementById('userTableBody');
+    if (!tbody) return;
+    const countBadge = document.getElementById('userCountBadge');
+    
+    // Grab current filter values
+    const search = document.getElementById('userSearch').value;
+    const level = document.getElementById('filterLevel').value;
+    const gender = document.getElementById('filterGender').value;
+    const course = document.getElementById('filterCourse').value;
+
+    // Build Query String
+    const params = new URLSearchParams({ search, level, gender, course });
+
+    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:20px;">Loading Students...</td></tr>';
 
     try {
-        const res = await fetch(`${BASE_URL}/admin/exam-config`, {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify(payload)
-        });
-        if(res.ok) alert("Exam configurations updated successfully!");
+        // FIX 1: Attach the params to the URL
+        const res = await fetch(`${BASE_URL}/admin/users?${params.toString()}`);
+        
+        // FIX 2: Use 'data' consistently
+        const data = await res.json(); 
+
+        if (!res.ok) throw new Error(data.error || "Failed to fetch");
+
+        // Update the count badge
+        if (countBadge) countBadge.innerText = data.count || 0;
+        
+        let html = '';
+        
+        // FIX 3: Access users through data.users
+        if (!data.users || data.users.length === 0) {
+            html = `<tr><td colspan="14" style="text-align:center; padding:40px; color:#64748b;">
+                        <div style="font-size: 2rem;">📂</div>
+                        No students found matching these criteria.
+                    </td></tr>`;
+        } else {
+            data.users.forEach((u, index) => {
+                const sn = index + 1;
+                const fullName = `${u.lastName} ${u.firstName} ${u.middleName || ''}`.toUpperCase();
+                
+                const regDate = new Date(u.createdAt).toLocaleDateString('en-GB');
+const regTime = new Date(u.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+const updateDate = new Date(u.updatedAt).toLocaleDateString('en-GB');
+const updateTime = new Date(u.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+const loginDisplay = u.lastLogin 
+    ? `${new Date(u.lastLogin).toLocaleDateString('en-GB')} <br> ${new Date(u.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+    : '<span style="color:#ef4444">Never</span>';
+
+                const subjects = u.subjectCombination ? u.subjectCombination.join(', ') : 'N/A';
+
+                // Use safer quotes for the JSON stringify in the onclick
+                const userJson = JSON.stringify(u).replace(/'/g, "&apos;");
+
+                html += `
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${sn}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">${fullName}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; color: #0ea5e9;">${u.regNo}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0;">${u.plainPassword || '---'}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; font-size: 0.65rem; color:#94a3b8; max-width:80px; overflow:hidden;">${u.password}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0;">${u.gender}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0;">${u.email || 'N/A'}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0;">${u.phone || 'N/A'}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0;">${u.courseOfStudy}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0;">${u.classLevel}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; font-size: 0.7rem;">${subjects}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; font-size: 0.7rem;">
+        ${regDate}<br><span style="color:#94a3b8;">${regTime}</span>
+    </td>
+    <td style="padding: 8px; border: 1px solid #e2e8f0; font-size: 0.7rem;">
+        ${updateDate}<br><span style="color:#0ea5e9;">${updateTime}</span>
+    </td>
+    <td style="padding: 8px; border: 1px solid #e2e8f0; font-size: 0.7rem;">
+        ${loginDisplay}
+    </td>
+    <td>
+        <button onclick="viewHistory('${u._id}', '${u.firstName}')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 0.75rem;">
+            Logs
+        </button>
+    </td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                        <button class="btn-edit-sm" onclick='prepareUserEdit(${userJson})'>Edit</button>
+                        <button class="btn-delete-sm"
+                        onclick="deleteUser('${u._id}',
+                        '${u.firstName}')">Delete</button>
+                    </td>
+                </tr>`;
+            });
+        }
+        tbody.innerHTML = html;
     } catch (e) {
-        alert("Failed to save settings");
+        console.error("Load users Error:", e);
+        tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; color:red; padding:20px;">Error loading student records.</td></tr>';
     }
 }
 
 
+// --- PREPARE EDIT (Fill form) ---
+function prepareUserEdit(user) {
+    currentEditingUserId = user._id;
+    
+    document.getElementById('uFirst').value = user.firstName;
+    document.getElementById('uMiddle').value = user.middleName || "";
+    document.getElementById('uLast').value = user.lastName;
+    document.getElementById('uGender').value = user.gender;
+    document.getElementById('uEmail').value = user.email || "";
+    document.getElementById('uPhone').value = user.phone || "";
+    document.getElementById('uCourse').value = user.courseOfStudy || "";
+    document.getElementById('uClass').value = user.classLevel;
+    
+    // For password, we leave it blank. If admin types a new one, it updates.
+    document.getElementById('uPass').value = "";
+    document.getElementById('uPass').placeholder = "Leave blank to keep old PIN";
+
+    // Select subjects (Skip 'Use of English')
+    const subSelect = document.getElementById('uSubs');
+    const userSubs = user.subjectCombination || [];
+    for (let i = 0; i < subSelect.options.length; i++) {
+        subSelect.options[i].selected = userSubs.includes(subSelect.options[i].value);
+    }
+
+    document.getElementById('regBtn').innerText = "Update Account";
+    
+    // Scroll to form
+    document.getElementById('enrollmentContent').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// --- DELETE USER ---
+let userIdToDelete = null;
+
+// 1. Open Modal
+function deleteUser(id, name) {
+    userIdToDelete = id;
+    const msg = document.getElementById('userDeleteMsg');
+    msg.innerHTML = `Are you sure you want to delete <strong>${name}</strong>?<br><span style="color: #ef4444; font-size: 0.8rem;">This will also delete their entire exam history.</span>`;
+    
+    document.getElementById('userDeleteModal').classList.remove('hidden');
+}
+
+// 2. Close Modal
+function closeUserDeleteModal() {
+    document.getElementById('userDeleteModal').classList.add('hidden');
+    userIdToDelete = null;
+}
+
+// 3. Execute Deletion (Attach to the "Delete Account" button)
+document.getElementById('confirmUserDeleteBtn').onclick = async () => {
+    if (!userIdToDelete) return;
+
+    const btn = document.getElementById('confirmUserDeleteBtn');
+    const originalText = btn.innerText;
+    btn.innerText = "Deleting...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch(`${BASE_URL}/admin/users/${userIdToDelete}`, {
+            method: "DELETE"
+        });
+
+        if (res.ok) {
+            closeUserDeleteModal();
+            loadUsers(); // Refresh your table automatically
+        } else {
+            const data = await res.json();
+            alert("Error: " + (data.error || "Could not delete user"));
+        }
+    } catch (err) {
+        console.error("Delete request failed:", err);
+        alert("Server error. Check your connection.");
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+};
+
+
+
+////////NEW ONE FOR ADD QUESTIONS topics
+const englishStructure = {
+    "Section A: Comprehension and Summary": {
+        subtopics: ["Comprehension Passage", "Cloze Passage", "Reading Text"],
+        needsPassage: true
+    },
+    "Section B: Lexis and Structure": {
+        subtopics: ["Sentence Interpretation", "Antonyms", "Synonyms", "Sentence Completion"],
+        needsPassage: false
+    },
+    "Section C: Oral Forms": {
+        subtopics: ["Vowels", "Consonants", "Rhymes", "Word Stress", "Emphatic Stress"],
+        needsPassage: false
+    }
+};
+function handleSubjectChange() {
+    const sub = document.getElementById('qSubject').value;
+    const standardTopic = document.getElementById('standardTopicGroup');
+    const englishGroup = document.getElementById('englishTopicGroup');
+    const passageContainer = document.getElementById('passageContainer');
+
+    if (sub === "Use of English") {
+        // Hide standard Topic input, show English Group
+        if (standardTopic) standardTopic.style.display = 'none';
+        if (englishGroup) englishGroup.style.display = 'grid';
+    } else {
+        // Show standard Topic input, hide English Group & Passage
+        if (standardTopic) standardTopic.style.display = 'block';
+        if (englishGroup) englishGroup.style.display = 'none';
+        if (passageContainer) passageContainer.style.display = 'none';
+        
+        // Fetch Science topics (SS1-SS3 Physics/Math)
+        fetchTopicsBySubject();
+    }
+    
+    // Ensure the Question Editor itself is always visible
+    const qBody = document.getElementById('questionBodyContainer'); // If you have a wrapper
+    if (qBody) qBody.style.display = 'block';
+}
+
+
+function updateEngSubtopics() {
+    const section = document.getElementById('engSection').value;
+    const subSelect = document.getElementById('engSubtopic');
+    const subSubGroup = document.getElementById('engSubSub'); // The name/datalist input
+    const passageContainer = document.getElementById('passageContainer');
+    
+    subSelect.innerHTML = '<option value="">Select Type</option>';
+    
+    if (englishStructure[section]) {
+        englishStructure[section].subtopics.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            subSelect.appendChild(opt);
+        });
+    }
+
+    // NEW: Only show Passage for Comprehension or Cloze
+    const selectedSub = subSelect.value;
+    const needsPassage = selectedSub.includes("Comprehension") || selectedSub.includes("Cloze");
+    
+    passageContainer.style.display = needsPassage ? 'block' : 'none';
+}
+
+// Add this listener to catch when the Type dropdown changes
+document.getElementById('engSubtopic').addEventListener('change', function() {
+    const val = this.value;
+    const passageContainer = document.getElementById('passageContainer');
+    // Toggle based on subtopic selection
+    const needsPassage = val.includes("Comprehension") || val.includes("Cloze");
+    passageContainer.style.display = needsPassage ? 'block' : 'none';
+    
+    // Also refresh the datalist for this specific subtopic
+    fetchSubSubTopics();
+});
+
+async function fetchSubSubTopics() {
+    const sub = document.getElementById('engSubtopic').value;
+    const list = document.getElementById('engSubSubList');
+    if (!sub) return;
+
+    try {
+        // Fetch unique sub-subtopics for the selected English Subtopic
+        const res = await fetch(`${BASE_URL}/api/topics/subsub?subTopic=${encodeURIComponent(sub)}`);
+        const subsubs = await res.json();
+        
+        list.innerHTML = subsubs.map(s => `<option value="${s}">`).join('');
+    } catch (err) {
+        console.error("Error fetching sub-subtopics:", err);
+    }
+}
+
+function updateEngSubSubtopics() {
+    const subtopic = document.getElementById('engSubtopic').value;
+    const subSubInput = document.getElementById('engSubSub');
+    
+    if (!subtopic) return;
+
+    // Logic to guide the user on what the Sub-subtopic (Group) should be
+    if (subtopic === "Comprehension Passage") {
+        subSubInput.placeholder = "e.g., Passage 1 / Oil Discovery";
+    } else if (subtopic === "Cloze Passage/Register") {
+        subSubInput.placeholder = "e.g., Cloze Test A / Health";
+    } else if (subtopic === "Reading Text/Novel") {
+        subSubInput.placeholder = "e.g., The Life Changer / Chapter 1";
+    } else {
+        subSubInput.placeholder = "e.g., Group Name (Optional)";
+    }
+    
+    console.log(`Subtopic set to: ${subtopic}. Awaiting Sub-subtopic...`);
+}
+// Listener for English Sub-subtopic input
+
+async function handleEnglishSubSubInput() {
+    const val = document.getElementById('engSubSub').value.trim();
+    const subTopic = document.getElementById('engSubtopic').value;
+    const status = document.getElementById('topicStatus');
+    const qPassage = document.getElementById('qPassage');
+
+    if (!val) { 
+        if (status) status.innerText = ""; 
+        return; 
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/subsub/check?name=${encodeURIComponent(val)}&subTopic=${encodeURIComponent(subTopic)}`);
+        const data = await res.json();
+status.innerText = `✓ (${data.count} items)`;
+            status.style.color = "#10b981";
+            
+            // Auto-load if the editor is empty
+            if (qPassage && (!qPassage.innerText.trim() || qPassage.innerHTML === "<br>") && data.passage) {
+                qPassage.innerHTML = data.passage;
+                updateFullPreview(); // Call the corrected function name
+        } else {
+            status.innerText = "+ New Group";
+            status.style.color = "#f59e0b";
+        }
+        
+    } catch (err) {
+        console.error("SubSub Check Error:", err);
+    }
+}
 //----- QUESTION SAVE ----
 //let currentEditingId = null;
 async function saveQuestion() {
+    // 1. Get fundamental values first
     const btn = document.getElementById('qregBtn');
+    const subject = document.getElementById('qSubject').value;
+    const isEnglish = (subject === "Use of English");
+
+    // 2. Validation Check (Section A Passage Check)
+    if (isEnglish) {
+        const section = document.getElementById('engSection').value;
+        const passageEl = document.getElementById('qPassage');
+        // Check if Section A is selected AND if the passage is empty
+        if (section.includes("Section A") && (!passageEl || !passageEl.innerText.trim())) {
+            alert("Section A (Comprehension) requires a Passage. Please paste the context text.");
+            return; // Stop here
+        }
+    }
+
+    // 3. UI State: Loading
     btn.disabled = true;
     btn.innerText = currentEditingId ? "Updating..." : "Saving...";
 
-try {
+    try {
         // --- STEP A: CLOUD UPLOAD PHASE ---
-        // We loop through any files selected via the 📷 buttons
         for (const key in stagedFiles) {
             const file = stagedFiles[key];
             if (file) {
                 const formData = new FormData();
                 formData.append('image', file);
-
-                const uploadRes = await fetch(`${BASE_URL}/api/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
+                const uploadRes = await fetch(`${BASE_URL}/api/upload`, { method: 'POST', body: formData });
                 if (!uploadRes.ok) throw new Error(`Upload failed for ${key}`);
-                
                 const uploadData = await uploadRes.json();
-                
-                // Put the URL back into the correct text input
                 const targetId = (key === 'question') ? 'qImgInput' : `opt${key}Img`;
                 const targetInput = document.getElementById(targetId);
                 if (targetInput) targetInput.value = uploadData.url;
             }
         }
-// --- STEP B: DATA COLLECTION ---
+
+        // --- STEP B: DATA COLLECTION ---
         const options = [];
         ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
             const el = document.getElementById(`opt${letter}`);
@@ -823,84 +1392,84 @@ try {
                 options.push({
                     key: letter,
                     value: el.innerHTML,
-                    optionImage: img ? img.value : "" // Now contains the Cloudinary URL
+                    optionImage: img ? img.value : ""
                 });
             }
         });
 
+        // Use optional chaining (?.) and fallbacks (|| "") to prevent "null" errors
         const data = {
-            subject: document.getElementById('qSubject').value,
-            topic: document.getElementById('qTopic').value,
+            subject: subject,
+            topic: isEnglish ? document.getElementById('engSection').value : document.getElementById('qTopic').value,
+            subTopic: isEnglish ? document.getElementById('engSubtopic').value : "",
+            subSubTopic: isEnglish ? document.getElementById('engSubSub').value : "",
+            passage: isEnglish ? (document.getElementById('qPassage')?.innerHTML || "") : "",
             questionText: document.getElementById('qText').innerHTML,
-            questionImage: document.getElementById('qImgInput')?.value || "", // Added question image
+            questionImage: document.getElementById('qImgInput')?.value || "",
             options: options,
             correctOptionKey: document.querySelector('input[name="correct"]:checked').value,
             weight: document.getElementById('qWeight').value
         };
-    // --- STEP C: DATABASE SAVE ---
+
+        // --- STEP C: DATABASE SAVE ---
         const url = currentEditingId ? `${BASE_URL}/questions/${currentEditingId}` : `${BASE_URL}/questions`;
         const method = currentEditingId ? "PUT" : "POST";
-        
+
         const res = await fetch(url, {
             method: method,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         });
-        
+
         if (res.ok) {
-            // 1. Show the Modal with dynamic text
-            const modalTitle = document.getElementById('modalTitle'); // If you added this ID earlier
+            // Success Logic
+            const modalTitle = document.getElementById('modalTitle');
             if (modalTitle) modalTitle.innerText = currentEditingId ? "Question Updated!" : "Question Saved!";
             
             document.getElementById('modalQTopic').innerText = data.topic;
             document.getElementById('modalQSubject').innerText = data.subject;
             document.getElementById('questionSuccessModal').classList.remove('hidden');
+
+            // Reset UI
+            stagedFiles = {};
+            currentEditingId = null;
             
-            // 2. Reset Staging & ID
-            stagedFiles = {}; 
-            currentEditingId = null;["qText", "optA", "optB", "optC", "optD", "optE"].forEach(id => {
+            // Clear Editors
+            ["qText", "optA", "optB", "optC", "optD", "optE"].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.innerHTML = ""; 
+                if (el) el.innerHTML = "";
             });
 
-            // Clear inputs
-            ["qTopic", "qWeight", "optAImg", "optBImg", "optCImg", "optDImg", "optEImg", "qImgInput"].forEach(id => {
+            // Clear Inputs
+            ["qTopic", "qWeight", "optAImg", "optBImg", "optCImg", "optDImg", "optEImg", "qImgInput", "engSubSub"].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = (id === "qWeight") ? "1" : "";
             });
+            
+            // Clear English-specific fields
+            if(document.getElementById('qPassage')) document.getElementById('qPassage').innerHTML = "";
 
-            // Reset UI components
+            // Reset Previews
+            ['pQuestion', 'pQuestionImage', 'pOptions', 'pPassage'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = "";
+            });
+
             if (typeof fetchTopicsBySubject === "function") await fetchTopicsBySubject();
-            if (typeof updateTopicStats === "function") updateTopicStats(data.subject);
-            
-            // UI Updates
-            updateTopicStats(data.subject); 
+            updateTopicStats(data.subject);
+
             btn.innerText = "Save Question";
-            btn.style.background = ""; 
+            btn.style.background = "";
         }
-
-       /** document.getElementById('topicStatus').innerText = `(${existingTopics.length} topics)`;
-            
-            // Trigger the Topic Stats update inside the success block
-            updateTopicStats(data.subject); 
-            const saveBtn = document.getElementById('qregBtn');
-    if (saveBtn) {
-        saveBtn.innerText = "Save Question";
-        saveBtn.style.background = ""; // Returns to default CSS color
-    }
-    **/
-
-        
-        
     } catch (e) {
         console.error("Critical Save Error:", e);
         alert("Error: " + e.message);
     } finally {
         btn.disabled = false;
-        // Don't hardcode text here so it reflects the current mode if it fails
         btn.innerText = currentEditingId ? "Update Question" : "Save Question";
     }
 }
+
 async function loadQuestions() {
     // 1. Get UI Elements safely
     const subFilter = document.getElementById('manageSubFilter');
@@ -974,7 +1543,7 @@ async function loadQuestions() {
                         class="btn-edit-sm">
                     Edit
                 </button>
-                            <button onclick="confirmDelete('${q._id}', '${q.topic}')" class="btn-delete-sm">Delete</button>
+                            <button onclick="deleteQuestion('${q._id}', '${q.topic}')" class="btn-delete-sm">Delete</button>
                         </div>
                     </td>
                 </tr>
@@ -995,6 +1564,7 @@ async function loadQuestions() {
 }
 
 function prepareEdit(q) {
+  handleSubjectChange();
     console.log("Starting edit for:", q._id);
     
     try {
@@ -1008,12 +1578,40 @@ function prepareEdit(q) {
         // 3. Reset the Options UI (removes C, D, E if they were there from a previous edit)
         resetOptionsToDefault();
         console.log("Options reset");
+// 4. Fill basic fields with Safety Checks
+        const subField = document.getElementById('qSubject');
+        if (subField) {
+            subField.value = q.subject || "";
+            // Trigger the UI toggle to show/hide English groups
+            handleSubjectChange(); 
+        }
 
-        // 4. Fill basic fields with Safety Checks
-        if (document.getElementById('qSubject')) document.getElementById('qSubject').value = q.subject || "";
-        if (document.getElementById('qTopic')) document.getElementById('qTopic').value = q.topic || "";
+        if (q.subject === "Use of English") {
+            // Fill English specific dropdowns and passage
+            const engSect = document.getElementById('engSection');
+            const engSub = document.getElementById('engSubtopic');
+            const engSubSub = document.getElementById('engSubSub');
+            const engPass = document.getElementById('qPassage');
+
+            if (engSect) engSect.value = q.topic || "";
+            
+            // Re-populate subtopic list based on the section
+            updateEngSubtopics(); 
+            if (engSub) engSub.value = q.subTopic || "";
+            
+            // Set placeholders/logic for sub-subtopic
+            updateEngSubSubtopics(); 
+            if (engSubSub) engSubSub.value = q.subSubTopic || "";
+            if (engPass) engPass.innerHTML = q.passage || "";
+        } else {
+            // Standard Topic for Math/Physics
+            if (document.getElementById('qTopic')) document.getElementById('qTopic').value = q.topic || "";
+        }
+
         if (document.getElementById('qWeight')) document.getElementById('qWeight').value = q.weight || 1;
         if (document.getElementById('qText')) document.getElementById('qText').innerHTML = q.questionText || "";
+        document.getElementById('qImgInput').value = q.questionImage || "";
+
 
         // 5. Fill Options
         if (q.options && Array.isArray(q.options)) {
@@ -1040,6 +1638,8 @@ function prepareEdit(q) {
             console.warn("Could not find radio button for key:", q.correctOptionKey);
         }
 const saveBtn = document.getElementById('qregBtn');
+// Don't forget to call the preview so it shows up immediately on load
+updateFullPreview();
 
 if (saveBtn) {
     saveBtn.innerText = "Update Question";
@@ -1083,29 +1683,56 @@ function resetOptionsToDefault() {
     if(document.getElementById('optB')) document.getElementById('optB').innerHTML = "";
 }
 
-async function deleteQuestion(id, topic) {
-    // 1. Safety Confirmation
-    const confirmDelete = confirm(`Are you sure you want to delete this question from "${topic}"? This cannot be undone.`);
+// Variable to keep track of what we are about to delete
+let questionIdToDelete = null;
+
+// 1. Function called by the table button
+function deleteQuestion(id, topic) {
+    questionIdToDelete = id; // Store the ID
     
-    if (!confirmDelete) return;
+    // Update the text in the modal
+    const msg = document.getElementById('deleteModalMsg');
+    msg.innerHTML = `Are you sure you want to delete the question from <strong>"${topic}"</strong>? <br>This cannot be undone.`;
+    
+    // Show the modal
+    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+}
+
+// 2. Function to close the modal
+function closeDeleteModal() {
+    document.getElementById('deleteConfirmModal').classList.add('hidden');
+    questionIdToDelete = null;
+}
+
+// 3. The actual Execution (Attach this to your "Yes, Delete" button)
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    if (!questionIdToDelete) return;
+
+    const btn = document.getElementById('confirmDeleteBtn');
+    btn.innerText = "Deleting...";
+    btn.disabled = true;
 
     try {
-        const res = await fetch(`${BASE_URL}/questions/${id}`, {
+        const res = await fetch(`${BASE_URL}/questions/${questionIdToDelete}`, {
             method: "DELETE"
         });
 
         if (res.ok) {
-            // 2. Refresh the table immediately
-            loadQuestions();
-            // 3. Optional: Show a small toast or update topic stats
-            console.log("Deleted successfully");
+            closeDeleteModal();
+            loadQuestions(); // Refresh your table
+            // If you have the topic stats logic, trigger it here
+            if (typeof fetchTopicsBySubject === "function") fetchTopicsBySubject();
         } else {
             alert("Delete failed. Please try again.");
         }
     } catch (err) {
         console.error("Error deleting:", err);
+        alert("Server error during deletion.");
+    } finally {
+        btn.innerText = "Yes, Delete";
+        btn.disabled = false;
     }
-}
+});
 
  
 function closeQModal() {
@@ -1229,6 +1856,9 @@ function execCmd(command) { document.execCommand(command, false, null); }
         const data = await res.json();
         document.getElementById('topicCounter').innerText = `(${data.count} found)`;
     }
+    
+    
+    
 
     const qTextInput = document.getElementById('qText');
 
@@ -1275,11 +1905,6 @@ function openMathModal(targetId) {
     setTimeout(() => input.focus(), 10); // Tiny timeout to ensure focus works
 }
 
-function closeMathModal() {
-    const modal = document.getElementById('mathModal');
-    modal.style.display = 'none';
-    modal.classList.add('hidden');
-}
 function confirmMath() {
     const math = document.getElementById('mathInput').value;
     if (math && activeTargetId) {
@@ -1298,8 +1923,14 @@ function confirmMath() {
     closeMathModal();
 }
 
+function closeMathModal() {
+    const modal = document.getElementById('mathModal');
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+}
+
 document.getElementById('mathInput')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') confirmMath();
+    if (e.key === 'Enter') {confirmMath();}
 });
 
 //----- Toolbar Editor Settings---
@@ -1308,6 +1939,11 @@ function formatMain(cmd, btnId) {
     document.getElementById('qText').focus();
     document.execCommand(cmd, false, null);
     checkMainFormat();
+}
+function formatPassage(cmd, btnId) {
+    document.getElementById('qPassage').focus();
+    document.execCommand(cmd, false, null);
+    checkPassageFormat();
 }
 
 function checkMainFormat() {
@@ -1327,6 +1963,21 @@ function checkMainFormat() {
     preview.innerHTML = qText.innerHTML;
     if(window.MathJax) MathJax.typesetPromise([preview]);
 }
+
+function checkPassageFormat() {
+    // Check all three states
+    const isBold = document.queryCommandState('bold');
+    const isItal = document.queryCommandState('italic');
+    const isUnder = document.queryCommandState('underline');
+    
+    // Toggle active classes
+    document.getElementById('qPBold').classList.toggle('active', isBold);
+    document.getElementById('qPItal').classList.toggle('active', isItal);
+    document.getElementById('qPUnder').classList.toggle('active', isUnder);
+    
+    if(window.MathJax) MathJax.typesetPromise([preview]);
+}
+
 
 // Formatting for Options
 function formatOpt(cmd, editorId, boldBtnId, italBtnId, underBtnId) {
@@ -1406,73 +2057,118 @@ function addSigmaToOpt(targetId) {
 }
 
 function updateFullPreview() {
+  const subject = document.getElementById('qSubject').value;
+    const pPassage = document.getElementById('pPassage');
+    
+    // 1. Handle Passage Preview
+    if (subject === "Use of English") {
+        const passageHTML = document.getElementById('qPassage').innerHTML;
+        if (passageHTML.trim() !== "" && passageHTML !== "<br>") {
+            pPassage.innerHTML = `<div style="color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0; margin-bottom: 5px; font-size: 0.7rem;">READING CONTEXT</div>${passageHTML}`;
+            pPassage.style.display = "block";
+        } else {
+            pPassage.style.display = "none";
+        }
+    } else {
+        pPassage.style.display = "none";
+    }
+
+    // 2. Handle Question Preview
+    const qText = document.getElementById('qText').innerHTML;
+    document.getElementById('pQuestion').innerHTML = qText || "<span style='color: #cbd5e1;'>Question text will appear here...</span>";
+  
     const pQuestion = document.getElementById('pQuestion');
+    const pQImage = document.getElementById('pQuestionImage');
     const pOptions = document.getElementById('pOptions');
     
-    // 1. Update Question Text
-    pQuestion.innerHTML = document.getElementById('qText').innerHTML;
+    // --- 1. Question Text ---
+    pQuestion.innerHTML = document.getElementById('qText').innerHTML || "Question text will appear here...";
     
-    // 2. Update Options
+    // --- 2. Question Image ---
+    // Logic: Check stagedFiles first (local), then check the text input (cloud URL)
+    let qImgSrc = "";
+    if (stagedFiles['question']) {
+        qImgSrc = URL.createObjectURL(stagedFiles['question']);
+    } else {
+        qImgSrc = document.getElementById('qImgInput').value;
+    }
+
+    pQImage.innerHTML = qImgSrc ? `<img src="${qImgSrc}" style="max-width:100%; max-height:200px; border-radius:8px;">` : "";
+
+    // --- 3. Options ---
     let optionsHTML = '';
-    ['A', 'B', 'C', 'D'].forEach(letter => {
+    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
         const opt = document.getElementById(`opt${letter}`);
         if (opt) {
-            // Check if this is the correct answer to highlight it in preview
-            const isCorrect = document.querySelector(`input[name="correct"][value="${letter}"]`).checked;
+            const isCorrect = document.querySelector(`input[name="correct"][value="${letter}"]`)?.checked;
             const style = isCorrect ? 'border: 2px solid #10b981; background: #ecfdf5;' : 'border: 1px solid #e2e8f0; background: white;';
             
+            // Check for Option Image (Staged or URL)
+            let optImgSrc = "";
+            if (stagedFiles[letter]) {
+                optImgSrc = URL.createObjectURL(stagedFiles[letter]);
+            } else {
+                const imgInput = document.getElementById(`opt${letter}Img`);
+                optImgSrc = imgInput ? imgInput.value : "";
+            }
+
+            const imgHTML = optImgSrc ? `<div style="margin-top:5px;"><img src="${optImgSrc}" style="max-height:80px; border-radius:4px;"></div>` : "";
+
             optionsHTML += `
                 <div style="padding: 10px; border-radius: 8px; ${style}">
                     <strong>${letter}:</strong> ${opt.innerHTML}
+                    ${imgHTML}
                 </div>`;
         }
     });
     pOptions.innerHTML = optionsHTML;
 
-    // 3. Re-render MathJax
+    // --- 4. MathJax ---
     if (window.MathJax && window.MathJax.typesetPromise) {
         MathJax.typesetPromise([pQuestion, pOptions]).catch((err) => console.log(err));
     }
 }
-
+document.getElementById('qPassage').addEventListener('input',updateFullPreview);
 
 //------ TOPIC HANDLER ------
 document.getElementById('qSubject').addEventListener('change', fetchTopicsBySubject);
 document.getElementById('qTopic').addEventListener('input', handleTopicInput);
 let existingTopics = []; // Global store for the current subject's topics
-
+// Updated to match your app.get('/api/topics') route
 async function fetchTopicsBySubject() {
     const subject = document.getElementById('qSubject').value;
     const topicList = document.getElementById('topicList');
     const status = document.getElementById('topicStatus');
     
-    if (!subject) {
-        existingTopics = [];
-        topicList.innerHTML = '';
-        status.innerText = '';
-        return;
-    }
+    // Don't run for English
+    if (!subject || subject === "Use of English") return;
+
     try {
-        const response = await fetch(`/api/topics/info?subject=${encodeURIComponent(subject)}`);
+        // We use /api/topics because that's what you defined in your backend
+        const response = await fetch(`${BASE_URL}/api/topics?subject=${encodeURIComponent(subject)}`);
         existingTopics = await response.json(); 
 
-        topicList.innerHTML = existingTopics.map(t => `<option value="${t}">`).join('');
-        status.innerText = `(${existingTopics.length} topics found)`;
+        if (topicList) {
+            topicList.innerHTML = existingTopics.map(t => `<option value="${t}">`).join('');
+        }
+        if (status) status.innerText = `(${existingTopics.length} topics found)`;
     } catch (err) {
         console.error("Error fetching topics:", err);
     }
 }
+
     
 
 function handleTopicInput() {
     const input = document.getElementById('qTopic').value.trim();
     const status = document.getElementById('topicStatus');
+if (!status) return;
 
     if (!input) {
-        status.innerText = `(${existingTopics.length} existing topics)`;
-        status.style.color = "#64748b";
+        status.innerText = "";
         return;
     }
+    
 
     // Check for exact match (case insensitive)
     const match = existingTopics.find(t => t.toLowerCase() === input.toLowerCase());
@@ -1513,7 +2209,7 @@ async function runTopicMerge() {
     if (!confirm(`This will rename "${oldTopic}" to "${newTopic}" for ALL ${subject} questions. Proceed?`)) return;
 
     try {
-        const response = await fetch('/api/topics/merge', {
+        const response = await fetch(`${BASE_URL}/api/topics/merge`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ subject, oldTopic, newTopic })
@@ -1540,7 +2236,7 @@ async function showTopicAnalytics() {
     list.innerHTML = "Loading...";
 
     try {
-        const response = await fetch(`/api/topics/stats?subject=${encodeURIComponent(subject)}`);
+        const response = await fetch(`${BASE_URL}/api/topics/stats?subject=${encodeURIComponent(subject)}`);
         const stats = await response.json();
 
         if (stats.length === 0) {
@@ -1568,126 +2264,6 @@ async function showTopicAnalytics() {
 // Attach this to your format functions so it updates when you click Bold/Italic too!
 
 
-//--------- Manage Exam ---------
-let assignedStudentList = []; // Array of Reg Numbers
-
-// 1. Enter "Edit Mode"
-function editExam(exam) {
-    // Fill the inputs
-    document.getElementById('editExamId').value = exam._id;
-    document.getElementById('exTitle').value = exam.title;
-    document.getElementById('exTime').value = exam.duration;
-    document.getElementById('exShuffle').value = exam.shuffleType || 'both';
-    document.getElementById('exAttempts').value = exam.attempts || 1;
-    document.getElementById('exStatus').value = exam.status || 'active';
-    
-    // Load the assigned students
-    assignedStudentList = exam.assignedStudents || [];
-    renderStudentBadges();
-
-    // UI Changes
-    document.getElementById('examFormTitle').innerText = "Editing: " + exam.title;
-    document.getElementById('saveExamBtn').innerText = "Update Exam Settings";
-    document.getElementById('cancelEditBtn').style.display = "inline-block";
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// 2. Save Logic
-async function saveExamSettings() {
-    const examId = document.getElementById('editExamId').value;
-    const examData = {
-        id: examId, // Will be empty string for new exams
-        title: document.getElementById('exTitle').value,
-        duration: document.getElementById('exTime').value,
-        shuffleType: document.getElementById('exShuffle').value,
-        attempts: document.getElementById('exAttempts').value,
-        status: document.getElementById('exStatus').value,
-        assignedStudents: assignedStudentList
-    };
-
-    if (!examData.title) return alert("Please enter an Exam Title");
-
-    try {
-        const response = await fetch('/api/exams/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(examData)
-        });
-
-        if (response.ok) {
-            alert(examId ? "Exam Updated!" : "Exam Created!");
-            resetExamForm();
-            loadExams(); // Refresh the table
-        }
-    } catch (err) {
-        console.error("Save failed", err);
-    }
-}
-
-// 3. Reset Form
-function resetExamForm() {
-    document.getElementById('editExamId').value = "";
-    document.getElementById('exTitle').value = "";
-    document.getElementById('exTime').value = "60";
-    document.getElementById('examFormTitle').innerText = "Exam Configuration";
-    document.getElementById('saveExamBtn').innerText = "Create Exam";
-    document.getElementById('cancelEditBtn').style.display = "none";
-    assignedStudentList = [];
-    renderStudentBadges();
-}
-function renderStudentBadges() {
-    const container = document.getElementById('stuBadgeContainer');
-    container.innerHTML = assignedStudentList.map(regNo => `
-        <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:15px; font-size:12px; display:flex; align-items:center; gap:5px;">
-            ${regNo} 
-            <b onclick="removeStudent('${regNo}')" style="cursor:pointer; color:#ef4444;">&times;</b>
-        </span>
-    `).join('');
-}
-
-function removeStudent(regNo) {
-    assignedStudentList = assignedStudentList.filter(s => s !== regNo);
-    renderStudentBadges();
-}
-
-// Add all students from a specific class (SS1, SS2, or SS3)
-async function addStudentsByGroup() {
-    const className = document.getElementById('groupSelect').value;
-    if (!className) return;
-
-    try {
-        const response = await fetch(`/api/students/by-group?class=${encodeURIComponent(className)}`);
-        const regNumbers = await response.json();
-        
-        // Merge with existing list, preventing duplicates
-        const uniqueList = new Set([...assignedStudentList, ...regNumbers]);
-        assignedStudentList = Array.from(uniqueList);
-        
-        renderStudentBadges();
-    } catch (err) {
-        alert("Error adding group");
-    }
-}
-
-// Search and add individual students
-async function searchStudents() {
-    const query = document.getElementById('stuSearch').value;
-    if (query.length < 2) return; // Don't search for just 1 letter
-
-    try {
-        const response = await fetch(`/api/students/search?q=${encodeURIComponent(query)}`);
-        const students = await response.json();
-        
-        // Show a small dropdown or just add the first result if it's an exact RegNo match
-        // For simplicity, let's assume if they find the right one, they click it
-        // (You could expand this to show a dropdown list)
-        console.log("Found students:", students);
-    } catch (err) {
-        console.error(err);
-    }
-}
-
 //---- PASSWORD GENERATION-----
 function generatePassword() {
     const chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // Removed confusing chars like 0, O, 1, I
@@ -1701,6 +2277,21 @@ function generatePassword() {
 function closeModal() {
     document.getElementById('successModal').classList.add('hidden');
 }
+
+// Expand and collapse toggle
+function toggleCard(contentId, btn) {
+    const content = document.getElementById(contentId);
+    content.classList.toggle('hidden');
+    const isHidden = content.classList.contains('hidden');
+    btn.innerText = isHidden ? "Expand ▼" : "Collapse ▲";
+    
+    if (contentId === 'userListContent' && !isHidden) {
+        loadUsers(); // Load users only when the card is expanded
+    }
+}
+
+
+
 
 /****** questions and Options Image ******/
 async function handleFileUpload(input) {
@@ -1729,6 +2320,569 @@ async function handleFileUpload(input) {
         status.innerText = "Upload failed!";
     }
 }
+
+
+//// EXAM CONFIGURATION + MANAGE EXAMS
+
+let selectedEngDist = [];
+let assignedStudentList = [];
+let assignmentType = "Custom";
+
+// 1. Generate Batch Time Inputs
+function generateBatchUI() {
+    const count = document.getElementById('exBatchCount').value;
+    const container = document.getElementById('batchContainer');
+    container.innerHTML = '';
+    for (let i = 1; i <= count; i++) {
+        container.innerHTML += `
+            <div class="batch-row" style="background:#fff; padding:8px; border:1px solid #eee; border-radius:5px;">
+                <small>Batch ${i}</small><br>
+                <input type="time" class="b-start" title="Start"> to <input type="time" class="b-end" title="End">
+            </div>`;
+    }
+}
+
+// 2. English Distribution Modal
+// The Full UTME English Subtopic List
+const jambEngSubtopics = [
+    { section: "Section A", topic: "Comprehension Passages" },
+    { section: "Section A", topic: "Cloze Passage" },
+    { section: "Section A", topic: "Reading Text" },
+    { section: "Section B", topic: "Sentence Interpretation" },
+    { section: "Section B", topic: "Antonyms" },
+    { section: "Section B", topic: "Synonyms" },
+    { section: "Section B", topic: "Sentence Completion" },
+    { section: "Section C", topic: "Oral Forms" }
+];
+
+function openEngModal() {
+    document.getElementById('engDistModal').classList.remove('hidden');
+    const list = document.getElementById('engTopicList');
+    
+    // Check if we are editing an existing exam to pre-fill values
+    const existingMap = new Map(selectedEngDist.map(d => [d.topic, d.qty]));
+
+    list.innerHTML = jambEngSubtopics.map(item => {
+        const qty = existingMap.get(item.topic) || 0;
+        return `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:8px; background:#f8fafc; border-radius:6px;">
+            <div style="flex:1;">
+                <small style="color:#64748b; font-size:0.7rem; font-weight:bold;">${item.section}</small>
+                <div style="font-size:0.9rem; color:#1e293b;">${item.topic}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <label style="font-size:0.75rem; color:#64748b;">Qty:</label>
+                <input type="number" class="eng-qty-input" 
+                       data-topic="${item.topic}" 
+                       oninput="calculateTotalEng()"
+                       style="width:70px; padding:4px; border:1px solid #cbd5e1; border-radius:4px;" 
+                       value="${qty}">
+            </div>
+        </div>`;
+    }).join('');
+    
+    calculateTotalEng(); // Initial count
+}
+
+function calculateTotalEng() {
+    let total = 0;
+    document.querySelectorAll('.eng-qty-input').forEach(input => {
+        total += parseInt(input.value) || 0;
+    });
+    const label = document.getElementById('totalEngCount');
+    label.innerText = `Total Selected: ${total} / 60`;
+    
+    // Visual feedback if target is met
+    if (total === 60) {
+        label.style.color = "#10b981";
+    } else if (total > 60) {
+        label.style.color = "#ef4444";
+    } else {
+        label.style.color = "#2563eb";
+    }
+}
+
+function applyEngDist() {
+    selectedEngDist = [];
+    document.querySelectorAll('.eng-qty-input').forEach(input => {
+        const qty = parseInt(input.value) || 0;
+        if (qty > 0) {
+            selectedEngDist.push({
+                topic: input.dataset.topic,
+                qty: qty
+            });
+        }
+    });
+    document.getElementById('distSummary').innerText = `Distribution set for ${selectedEngDist.length} English topics.`;
+    closeEngModal();
+}
+
+// 3. Save Exam
+
+async function saveExamSettings() {
+    const btn = document.getElementById('saveExamBtn');
+    const editId = document.getElementById('editExamId').value;
+    const originalText = btn.innerText;
+    
+    // Validation
+    if (!document.getElementById('exTitle').value) return alert("Please enter an Exam Title");
+
+    // Visual Feedback
+    btn.disabled = true;
+    btn.innerText = "Saving... Please wait";
+    btn.style.opacity = "0.7";
+
+    const batches = [];
+    document.querySelectorAll('.b-start').forEach((el, i) => {
+        const endEl = document.querySelectorAll('.b-end')[i];
+        if (el.value && endEl.value) {
+            batches.push({
+                batchNumber: i + 1,
+                startTime: el.value,
+                endTime: endEl.value
+            });
+        }
+    });
+
+    const payload = {
+        id: editId || null, // CRITICAL: This tells the backend to UPDATE if ID exists
+        title: document.getElementById('exTitle').value,
+        durationMinutes: document.getElementById('exTime').value,
+        maxAttempts: document.getElementById('exAttempts').value,
+        shuffleType: document.getElementById('exShuffle').value,
+        startDateTime: document.getElementById('exStart').value,
+        endDateTime: document.getElementById('exEnd').value,
+        batchSettings: batches,
+        englishDist: selectedEngDist,
+        otherSubjectsDist: {
+            qtyPerSubject: 40,
+            pickFromEveryTopic: true 
+        },
+        assignedStudents: assignedStudentList,
+        totalQuestions: document.getElementById('exTotalQty').value,
+        assignmentType: assignmentType
+    };
+
+    try {
+        // Use the unified save route
+        const res = await fetch(`${BASE_URL}/api/exams/save`, {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+            alert(result.message || "Exam saved successfully!");
+            resetExamForm();
+            loadExams();
+        } else {
+            alert("Error: " + (result.error || "Could not save exam"));
+        }
+    } catch (e) { 
+        console.error("Save Error:", e);
+        alert("Server connection failed.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
+        btn.style.opacity = "1";
+    }
+}
+
+
+// 4. Load Exams Table
+async function loadExams() {
+    console.log("Attempting to load exams...");
+    try {
+        const res = await fetch(`${BASE_URL}/api/exams`);
+        if (!res.ok) throw new Error("Failed to fetch");
+        const exams = await res.json();
+        
+        const tbody = document.getElementById('examTableBody');
+        if (!tbody) return; // Guard clause
+
+        if (exams.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No exams created yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = exams.map((ex, index) => {
+            // Add fallback values to prevent crashes
+            const title = ex.title || "Untitled Exam";
+            const batches = ex.batchSettings ? ex.batchSettings.length : 0;
+            const students = ex.assignedStudents ? ex.assignedStudents.length : 0;
+                    // Formatting the Creation/Update dates
+            const created = new Date(ex.createdAt).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' });
+            const updated = new Date(ex.updatedAt).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' });
+
+            // Formatting the Exam Window (Start/End)
+            const start = ex.startDateTime ? new Date(ex.startDateTime).toLocaleString('en-NG', { dateStyle: 'short', timeStyle: 'short' }) : "N/A";
+            const end = ex.endDateTime ? new
+            Date(ex.endDateTime).toLocaleString('en-NG', { dateStyle: 'short',
+            timeStyle: 'short' }) : "N/A";
+
+            return `
+        <tr>
+            <td>${index + 1}</td>
+            <td>
+                <strong>${ex.title}</strong><br>
+                <small>${ex.batchSettings.length} Batches</small>
+            </td>
+            <td>${ex.assignedStudents.length} Students</td>
+            <td>
+                Q: ${ex.totalQuestions || 0}<br>
+                T: ${ex.durationMinutes} mins
+            </td>
+            <td>
+                Attempts: ${ex.maxAttempts}<br>
+                <small>Shuffle: ${ex.shuffleType}</small>
+            </td>
+          
+            <td>
+                <div style="font-size:0.7rem; color:#64748b;">
+                            Created: ${created}<br>
+                            Updated: ${updated}
+                        </div>
+            </td>
+            <td>${getLiveStatus(ex.startDateTime, ex.endDateTime)}
+            <div style="font-size:0.7rem; color:#475569; margin-top:5px; line-height:1.2;">
+                            <span style="color:#059669;">▶</span> ${start}<br>
+                            <span style="color:#dc2626;">■</span> ${end}
+                        </div>
+            </td>
+            <td>
+                <button onclick='editExam(${JSON.stringify(ex)})'>Edit</button>
+                
+<div style="display:flex; flex-direction:column; gap:5px;">
+    <button style="background:#8b5cf6; color:white;" onclick="shuffleAndDistribute('${ex._id}')">
+        Distribute Batches
+    </button>
+    <button style="background:#10b981; color:white;" onclick="sendSchedules('${ex._id}', '${ex.title}')">
+        Send Schedules
+    </button>
+</div>
+                <button style="background: #64748b; color: white;" 
+                        onclick="openResetModal('${ex._id}')" 
+                        title="Clear all student scores for this exam">
+                    Reset Progress
+                </button>
+                <button onclick="deleteExam('${ex._id}')"
+                style="color:red">Delete</button>
+            </td>
+        </tr>
+        `;
+        }).join('');
+      } catch (err) {
+        console.error("Table Load Error:", err);
+    }
+}
+
+function getLiveStatus(start, end) {
+    const now = new Date();
+    if (now < new Date(start)) return '<span class="status-upcoming">Upcoming</span>';
+    if (now > new Date(end)) return '<span class="status-ended">Ended</span>';
+    return '<span class="status-active">Active</span>';
+}
+
+// --- EXAM MANAGEMENT CORE ---
+
+// Delete Exam with Confirmation
+async function deleteExam(id) {
+    if (!confirm("Are you sure? This will delete all configurations for this exam.")) return;
+    
+    try {
+        const res = await fetch(`${BASE_URL}/api/exams/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            alert("Exam Deleted.");
+            loadExams();
+        }
+    } catch (e) { console.error("Delete failed", e); }
+}
+
+// Reset Form to "Create Mode"
+function resetExamForm() {
+    // Clear Hidden ID
+    document.getElementById('editExamId').value = "";
+    
+    // Reset Basic Inputs
+    document.getElementById('exTitle').value = "";
+    document.getElementById('exTime').value = "60";
+    document.getElementById('exAttempts').value = "1";
+    document.getElementById('exTotalQty').value = "100";
+    document.getElementById('exStart').value = "";
+    document.getElementById('exEnd').value = "";
+    
+    // Reset Batches
+    document.getElementById('exBatchCount').value = "1";
+    document.getElementById('batchContainer').innerHTML = "";
+    
+    // Clear Global Variables
+    selectedEngDist = [];
+    assignedStudentList = [];
+    assignmentType = "Custom"; 
+
+    // Reset UI Labels
+    document.getElementById('examFormTitle').innerText = "Exam Configuration";
+    document.getElementById('saveExamBtn').innerText = "Create Exam";
+    document.getElementById('distSummary').innerText = "No distribution set.";
+    document.getElementById('stuBadgeContainer').innerHTML = "";
+    document.getElementById('stuSearch').value = "";
+    
+    console.log("Form and memory cleared.");
+}
+
+
+// Prepare Edit Mode
+function editExam(exam) {
+    // 1. Basic Info
+    document.getElementById('editExamId').value = exam._id;
+    document.getElementById('exTitle').value = exam.title;
+    document.getElementById('exTime').value = exam.durationMinutes;
+    document.getElementById('exAttempts').value = exam.maxAttempts || 1;
+    document.getElementById('exShuffle').value = exam.shuffleType || 'smart';
+    document.getElementById('exTotalQty').value = exam.totalQuestions || 60;
+
+    // 2. Dates (Formatted for datetime-local)
+    if (exam.startDateTime) {
+        document.getElementById('exStart').value = new Date(exam.startDateTime).toISOString().slice(0, 16);
+    }
+    if (exam.endDateTime) {
+        document.getElementById('exEnd').value = new Date(exam.endDateTime).toISOString().slice(0, 16);
+    }
+
+    // 3. Batches
+    const batchCount = exam.batchSettings ? exam.batchSettings.length : 1;
+    document.getElementById('exBatchCount').value = batchCount;
+    generateBatchUI(); // Rebuild the HTML inputs first
+    
+    const startInputs = document.querySelectorAll('.b-start');
+    const endInputs = document.querySelectorAll('.b-end');
+    
+    exam.batchSettings.forEach((batch, i) => {
+        if (startInputs[i]) startInputs[i].value = batch.startTime;
+        if (endInputs[i]) endInputs[i].value = batch.endTime;
+    });
+
+    // 4. English Distribution & Students
+    selectedEngDist = exam.englishDist || [];
+    assignedStudentList = exam.assignedStudents || [];
+    assignmentType = exam.assignmentType || 'Custom';
+    
+    document.getElementById('distSummary').innerText = `Loaded: ${selectedEngDist.length} English rules.`;
+    renderStudentBadges();
+
+    // 5. UI Updates
+    document.getElementById('examFormTitle').innerText = "Editing: " + exam.title;
+    document.getElementById('saveExamBtn').innerText = "Update Exam Settings";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+// Close Modal
+function closeEngModal() {
+    document.getElementById('engDistModal').classList.add('hidden');
+}
+
+// Call this when adding by group
+async function addStudentsByGroup() {
+    const className = document.getElementById('groupSelect').value;
+    if (!className) return alert("Select a class first");
+    
+    const res = await fetch(`${BASE_URL}/api/students/by-group?class=${className}`);
+    const regNumbers = await res.json(); // Backend should return array of Reg Nos
+    
+    if (regNumbers.length > 0) {
+        assignedStudentList = [...new Set([...assignedStudentList, ...regNumbers])];
+        assignmentType = className; 
+        renderStudentBadges();
+        alert(`Added ${regNumbers.length} students from ${className}`);
+    } else {
+        alert("No students found in this class.");
+    }
+}
+
+//Reset Exam
+let currentResetExamId = null;
+
+// 1. Open the Modal and Load Students
+async function openResetModal(examId) {
+    currentResetExamId = examId;
+    document.getElementById('resetModal').classList.remove('hidden');
+    const listContainer = document.getElementById('studentResetList');
+    listContainer.innerHTML = "Loading attempts...";
+
+    try {
+        // This route fetches everyone who has an entry in the Results/Attempts for this exam
+        const res = await fetch(`${BASE_URL}/api/exams/attempts/${examId}`);
+        const students = await res.json();
+
+        if (students.length === 0) {
+            listContainer.innerHTML = "<p style='text-align:center; color:#94a3b8;'>No student records found for this exam.</p>";
+            return;
+        }
+
+        listContainer.innerHTML = students.map(s => `
+            <div style="display:flex; align-items:center; gap:10px; padding:8px; border-bottom:1px solid #f8fafc;">
+                <input type="checkbox" class="reset-check" value="${s.regNo}">
+                <div style="font-size:0.85rem;">
+                    <strong>${s.name}</strong> (${s.regNo})<br>
+                    <small>Status: ${s.status} | Score: ${s.score || 'N/A'}</small>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) {
+        listContainer.innerHTML = "Error loading records.";
+    }
+}
+
+// 2. Process the Reset
+async function processReset(type) {
+    let targetRegNos = [];
+    
+    if (type === 'selected') {
+        document.querySelectorAll('.reset-check:checked').forEach(cb => targetRegNos.push(cb.value));
+        if (targetRegNos.length === 0) return alert("Select at least one student.");
+    }
+
+    const msg = type === 'all' 
+        ? "Are you sure you want to clear EVERYONE'S record for this exam?" 
+        : `Reset progress for ${targetRegNos.length} selected students?`;
+
+    if (!confirm(msg)) return;
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/exams/reset/${currentResetExamId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, regNumbers: targetRegNos })
+        });
+
+        if (res.ok) {
+            alert("Reset Successful!");
+            closeResetModal();
+        }
+    } catch (err) { alert("Reset failed."); }
+}
+
+function closeResetModal() {
+    document.getElementById('resetModal').classList.add('hidden');
+    currentResetExamId = null;
+}
+
+
+async function searchStudents() {
+    const q = document.getElementById('stuSearch').value;
+    const dropdown = document.getElementById('searchDropdown');
+    
+    if (q.length < 2) { 
+        dropdown.style.display = 'none'; 
+        return; 
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/students/search?q=${encodeURIComponent(q)}`);
+        const students = await res.json();
+
+        if (students.length > 0) {
+            dropdown.innerHTML = students.map(s => `
+    <div class="dropdown-item" onclick="selectStudent('${s.regNo}', '${s.fullName}')">
+        ${s.fullName} (${s.regNo}) - ${s.classLevel}
+    </div>
+`).join('');
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.innerHTML = '<div style="padding:10px; color:#94a3b8;">No student found</div>';
+            dropdown.style.display = 'block';
+        }
+    } catch (e) { console.error("Search error", e); }
+}
+
+function selectStudent(regNo, name) {
+    if (!assignedStudentList.includes(regNo)) {
+        assignedStudentList.push(regNo);
+        assignmentType = "Custom"; // Switching to individual selection
+        renderStudentBadges();
+    }
+    document.getElementById('stuSearch').value = "";
+    document.getElementById('searchDropdown').style.display = 'none';
+}
+function renderStudentBadges() {
+    const container = document.getElementById('stuBadgeContainer');
+    if (!container) return;
+    
+    // Show count so you know the group was added
+    const countHeader = `<div style="width:100%; font-size:0.75rem; color:#64748b; margin-bottom:5px;">
+                            Total Assigned: ${assignedStudentList.length} students
+                         </div>`;
+    
+    container.innerHTML = countHeader + assignedStudentList.map(regNo => `
+        <div class="badge-student" style="background:#f1f5f9; border:1px solid #cbd5e1; padding:2px 10px; border-radius:15px; display:inline-flex; align-items:center; gap:5px; margin:2px;">
+            <span style="font-size:0.8rem;">${regNo}</span>
+            <b onclick="removeStudent('${regNo}')" style="cursor:pointer; color:#ef4444; font-size:1rem;">&times;</b>
+        </div>
+    `).join('');
+}
+
+
+function removeStudent(regNo) {
+    assignedStudentList = assignedStudentList.filter(id => id !== regNo);
+    renderStudentBadges();
+}
+
+// BATCHES Distribution
+
+async function shuffleAndDistribute(examId) {
+    if (!confirm("This will randomly assign all selected students to the available batches. Continue?")) return;
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/exams/distribute-batches/${examId}`, {
+            method: 'POST'
+        });
+        const result = await res.json();
+        
+        if (res.ok) {
+            alert(`Success! ${result.count} students have been distributed across ${result.batches} batches.`);
+            loadExams(); // Refresh table to show updated status
+        } else {
+            alert("Error: " + result.error);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Server error during distribution.");
+    }
+}
+
+async function sendSchedules(examId, examTitle) {
+    // First Confirmation
+    const step1 = confirm(`PREPARING TO SEND EMAILS for: ${examTitle}\n\nThis will send login details to all assigned students. Proceed?`);
+    if (!step1) return;
+
+    // Second Strategic Confirmation
+    const step2 = confirm("FINAL CHECK: Are your Batch Times and Student List 100% correct? This action cannot be undone.");
+    if (!step2) return;
+
+    // Visual loading state
+    const btn = event.target;
+    const oldText = btn.innerText;
+    btn.innerText = "📧 Sending...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/exams/notify-students/${examId}`, { method: 'POST' });
+        if (res.ok) {
+            alert("Email dispatch started! Students will receive their schedules shortly.");
+        }
+    } catch (err) {
+        alert("Email service failed.");
+    } finally {
+        btn.innerText = oldText;
+        btn.disabled = false;
+    }
+}
+
+// Load automatically when the script runs
+document.addEventListener('DOMContentLoaded', loadExams);
 </script>
 </body>
 </html>
