@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CBT Admin | Management Portal</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
@@ -180,6 +183,27 @@
         </div>
         
         <div id="enrollmentContent">
+            <div style="background: #f0f9ff; border: 2px dashed #10b981; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <label style="font-weight: bold; color: #166534;">Bulk Enrollment (CSV)</label>
+            <button onclick="downloadCSVTemplate()" style="font-size: 0.75rem; color: #059669; background: none; border: 1px solid #059669; padding: 2px 8px; border-radius: 4px; cursor: pointer;">
+                Download Template
+            </button>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <input type="file" id="csvFileInput" accept=".csv" style="flex: 1; font-size: 0.85rem; border: 1px solid #dcfce7; padding: 8px; border-radius: 6px; background: white;">
+            <button onclick="processBulkCSV()" id="bulkBtn" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                Upload
+            </button>
+        </div>
+        <p style="font-size: 0.7rem; color: #64748b; margin-top: 8px;">
+            * Password and Reg No are auto-generated. Separate subjects with semicolons (e.g. Physics;Biology)
+        </p>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 15px; color: #94a3b8;">— OR
+    MANUALLY FILL —</div>
             <div class="form-grid" style="margin-top: 15px;">
                 <div class="input-group">
                     <label>First Name <button type="button" class="tool-btn-small" onclick="clearField('uFirst')">Clear</button></label>
@@ -290,6 +314,9 @@ margin-left: 10px;">0</span></h3>
         onkeyup="loadUsers()" style="padding: 8px; width: 120px;">
     </div>
     <button onclick="loadUsers()" class="tool-btn-small" style="height: 38px; background: #0ea5e9; color: white; border: none;">🔄 Refresh</button>
+    <button onclick="downloadUserCSV()" class="tool-btn-small" style="height: 38px; background: #059669; color: white; border: none; padding: 0 15px;">
+    📥 Export CSV
+</button>
 </div>
     <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem; white-space: nowrap;">
         <thead>
@@ -322,6 +349,23 @@ margin-left: 10px;">0</span></h3>
         
 
         <section id="addQuestions" class="tab-content hidden">
+          <div class="card" style="border: 2px dashed #6366f1; background: #f5f3ff; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0; color: #4338ca;">Bulk Question Upload</h3>
+        <button onclick="downloadQuestionTemplate()" class="tool-btn-small" style="background: #6366f1; color: white;">
+            📥 Download Template
+        </button>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="file" id="bulkQFile" accept=".csv" style="flex: 1; background: white; padding: 8px; border-radius: 6px;">
+        <button id="bulkQBtn" onclick="processBulkQuestions()" style="background: #4f46e5; color: white; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold;">
+            🚀 Upload Questions
+        </button>
+    </div>
+    <p style="font-size: 0.75rem; color: #6366f1; margin-top: 10px;">
+        * Supports HTML tags for formatting. Use <code>&lt;br&gt;</code> for new lines. Images must be URLs.
+    </p>
+</div>
             <div class="card">
                 <h3>Question Editor</h3>
                 <div class="form-grid">
@@ -521,22 +565,30 @@ margin-left: 10px;">0</span></h3>
        onkeyup="loadQuestions()" 
        placeholder="🔍 Type a topic (e.g., 'Trig')..." 
        style="flex: 2; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; outline: none;">
-        </div><div class="stats-bar">
+        <button onclick="exportQuestionsCSV()" class="tool-btn-small" style="background: #059669; color: white; border: none; height: 42px;">📥 Export CSV</button>
+        </div>
+        <div id="bulkActionBar" style="display: none; background: #fee2e2; border: 1px solid #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 15px; justify-content: space-between; align-items: center;">
+            <span id="selectedCount" style="font-weight: bold; color: #b91c1c;">0 questions selected</span>
+            <button onclick="deleteSelectedQuestions()" style="background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                🗑️ Delete Selected
+            </button>
+        </div>
+        <div class="stats-bar">
     Total Questions: <span id="qCountDisplay">0</span>
 </div>
 
         <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <table style="max-width: 100%; border-collapse: collapse; text-align: left;">
                 <thead>
-                    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                      
-                        <th style="padding: 12px;">S/N</th>
-                        <th style="padding: 12px;">Topic</th>
-                        <th style="padding: 12px;">Content</th>
-                        <th style="padding: 12px;">Last Updated</th>
-                        <th style="padding: 12px; text-align: center;">Actions</th>
-                    </tr>
-                </thead>
+    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+        <th style="padding: 12px; width: 15px;"><input type="checkbox" id="selectAllCheck" onclick="toggleSelectAll(this)"></th>
+        <th style="padding: 12px; width: 20px;">S/N</th>
+        <th style="padding: 12px; width: 30px;">Topic & Subject</th>
+        <th style="padding: 12px; width: 40px;">Question Content (Body & Options)</th>
+        <th style="padding: 12px; width: 30px;">Date</th>
+        <th style="padding: 12px; width: 30px; text-align: center;">Actions</th>
+    </tr>
+</thead>
                 <tbody id="questionsTableBody">
                     </tbody>
             </table>
@@ -687,44 +739,70 @@ margin-left: 10px;">0</span></h3>
             <div class="card">
                 <h3>Performance Analytics</h3>
                 <div class="analytics-grid">
-                    <div class="stat-card"><h4>Total Candidates</h4><p id="statTotal">0</p></div>
-                    <div class="stat-card" style="border-left-color: #10b981;"><h4>Highest Score</h4><p id="statHigh">0</p></div>
-                    <div class="stat-card" style="border-left-color: #f59e0b;"><h4>Average Score</h4><p id="statAvg">0</p></div>
-                </div>
+    <div class="stat-card"><h4>Candidates</h4><p id="statTotal">0</p></div>
+    <div class="stat-card"><h4>Highest Score</h4><p id="statHigh">0</p></div>
+    <div class="stat-card"><h4>Average Aggregate</h4><p id="statAvg">0</p></div>
+</div>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <select id="filterExam" onchange="fetchResults()" style="flex:1;"><option value="all">Sort by Exam</option></select>
-                    <select id="filterUser" onchange="fetchResults()" style="flex:1;"><option value="all">Sort by User</option></select>
-                    <button class="btn-save" style="width:auto;" onclick="fetchResults()">Refresh</button>
-                </div>
+<div class="filter-bar" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+    <div>
+        <label style="display:block; font-size:0.8rem; font-weight:bold; margin-bottom:5px;">FILTER BY EXAM</label>
+        <select id="filterExam" onchange="updateBatchOptions(); fetchResults()" style="width:100%; padding:10px; border-radius:6px; border:1px solid #cbd5e1;">
+            <option value="all">All Exams</option>
+            </select>
+    </div>
+    <div>
+        <label style="display:block; font-size:0.8rem; font-weight:bold; margin-bottom:5px;">BATCH</label>
+        <select id="filterBatch" onchange="fetchResults()" style="width:100%; padding:10px; border-radius:6px; border:1px solid #cbd5e1;">
+            <option value="all">All Batches</option>
+        </select>
+    </div>
+    <div>
+        <label style="display:block; font-size:0.8rem; font-weight:bold; margin-bottom:5px;">SEARCH CANDIDATE</label>
+        <input type="text" id="searchCandidate" oninput="fetchResults()" placeholder="Name or Reg No..." style="width:100%; padding:10px; border-radius:6px; border:1px solid #cbd5e1;">
+    </div>
+    <div style="display:flex; align-items:flex-end; gap:10px;">
+        <button class="btn-save" style="background:#059669; flex:1; padding:11px;" onclick="downloadCSV()">Export Excel</button>
+        <button class="btn-save" style="background:#64748b; flex:1; padding:11px;" onclick="fetchResults()">Refresh</button>
+    </div>
+    <div class="bulk-actions" style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <button onclick="publishResults(false)" class="tool-btn" style="background: #059669; color: white;">
+        📢 Publish Selected
+    </button>
+    <button onclick="publishResults(true)" class="tool-btn" style="background: #64748b; color: white;">
+        🧪 Send Test Mail
+    </button>
+</div>
+</div>
 
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>S/N</th>
-                                <th>Reg No</th>
-                                <th>Name</th>
-                                <th>Subject Scores (Click to view)</th>
-                                <th>Aggregate</th>
-                                <th>Time Spent</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminResultBody"></tbody>
-                    </table>
-                </div>
+<table style="width:100%; border-collapse: collapse; background:white; border-radius:8px; overflow:hidden;">
+    <thead style="background:#1e293b; color:white; text-align:left;">
+        <tr>
+            <th style="padding:15px;">SN</th>
+            <th style="padding:15px;">Student Info</th>
+            <th style="padding:15px;">Batch</th>
+            <th style="padding:15px;">Subject Scores (Normalized)</th>
+            <th style="padding:15px;">Aggregate</th>
+            <th style="padding:15px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody id="adminResultBody"></tbody>
+</table>
             </div>
         </section>
 
     </main>
 </div>
-<div id="scriptModal" class="hidden" style="position:fixed; top:0; left:0; width:90%; height:90%; background:rgba(0,0,0,0.8); z-index:1000; overflow-y:auto; padding:40px;">
-    <div style="background:white; max-width:900px; margin:auto; border-radius:12px; padding:30px; position:relative;">
-        <span onclick="closeModal()" style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:24px;">&times;</span>
-        <h2 id="modalTitle">Script Review</h2>
-        <hr>
-        <div id="modalContent"></div>
+<div id="scriptModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; display:none; align-items:center; justify-content:center; padding:0;">
+    
+    <div style="background:white; width:100%; max-width:550px; height:100%; max-height:100vh; border-radius:0; position:relative; display:flex; flex-direction:column; overflow:hidden;">
+        <div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; position:sticky; top:0; z-index:100;">
+            <h3 id="modalTitle" style="margin:0; font-size:1rem; color:#1e293b; max-width:85%;">Script Review</h3>
+            <span onclick="closeScriptModal()" style="cursor:pointer; font-size:32px; color:#94a3b8; line-height:1;">&times;</span>
+        </div>
+
+        <div id="modalContent" style="padding:15px; overflow-y:auto; flex:1; background:#f1f5f9;">
+            </div>
     </div>
 </div>
 
@@ -877,6 +955,17 @@ margin-left: 10px;">0</span></h3>
     </div>
 </div>
 
+<div id="historyModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:none; align-items:center; justify-content:center; padding:15px;">
+    <div style="background:white; width:95%; max-width:500px; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; max-height:85vh; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);">
+        <div style="padding:15px; background:#1e293b; color:white;">
+            <span onclick="closeHistory()" style="cursor:pointer; float:right; font-size:28px; line-height:20px;">&times;</span>
+            <h3 id="histName" style="margin:0; font-size:1.1rem;">Student Name</h3>
+            <small id="histReg" style="color:#94a3b8;"></small>
+        </div>
+        <div id="histContent" style="padding:15px; overflow-y:auto; flex:1; background:#f8fafc; -webkit-overflow-scrolling: touch;">
+            </div>
+    </div>
+</div>
 <!-------FRONTEND SCRIPT----->
 
 <script>
@@ -1003,17 +1092,191 @@ function showTab(tabId, element = null) {
 }
 
 
+// 1. Your 6-Character PIN Generator
+function generate6CharPIN() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let pin = "";
+    for (let i = 0; i < 6; i++) {
+        pin += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return pin;
+}
 
-function viewHistory(userId, firstName) {
-  console.log(`Fetching records for: ${firstName} (ID: ${userId})`);
+// 2. CSV Template Downloader
+function downloadCSVTemplate() {
+    const headers = "firstName,middleName,lastName,gender,email,phone,courseOfStudy,classLevel,subjects\n";
+    const blob = new Blob([headers], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Enrollment_Template.csv';
+    a.click();
+}
+
+// 3. Main Processing Logic
+
+async function processBulkCSV() {
+    const fileInput = document.getElementById('csvFileInput');
+    const btn = document.getElementById('bulkBtn');
     
-    // Switch to your results/history tab
-     //showTab('resultsTab'); 
+    if (!fileInput.files[0]) return alert("Please select a CSV file.");
     
-    // Apply a filter to your results table
-     //filterResultsByStudent(userId);
-    alert("Fetching exam history for User ID: " + userId + ". This feature is coming in the next update!");
-    // Later we will build the logic to filter the Results tab for this ID.
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const text = e.target.result;
+        // Split by lines and filter out completely empty lines
+        const rows = text.split(/\r?\n/).filter(row => row.trim() !== '');
+        const dataRows = rows.slice(1); // Skip header
+
+        let successCount = 0;
+        let errorCount = 0;
+        let errorMessages = [];
+
+        for (const row of dataRows) {
+            // Regex to handle commas inside quotes (if any)
+            const values = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
+            const cleanValues = values.map(v => v.trim().replace(/^"|"$/g, ''));
+
+            if (cleanValues.length < 5) continue; // Skip malformed rows
+
+            // ... inside the loop ...
+const rawClass = cleanValues[7] ? cleanValues[7].toUpperCase().replace(/\s/g, '') : "";
+let formattedClass = rawClass;
+
+// Auto-fix common entries like "1", "2", "3" to "SS1", "SS2", "SS3"
+if (rawClass === "1") formattedClass = "SS1";
+if (rawClass === "2") formattedClass = "SS2";
+if (rawClass === "3") formattedClass = "SS3";
+// Handle "SS 1" or "ss1"
+if (rawClass === "SS1" || rawClass === "SS2" || rawClass === "SS3") {
+    formattedClass = rawClass;
+}
+
+const payload = {
+    firstName: cleanValues[0],
+    middleName: cleanValues[1] || "",
+    lastName: cleanValues[2],
+    gender: cleanValues[3], // Ensure this is "Male" or "Female" (Capitalized)
+    email: cleanValues[4],
+    phone: cleanValues[5] || "",
+    courseOfStudy: cleanValues[6],
+    classLevel: formattedClass, // Now sends "SS1" instead of "1"
+    subjects: cleanValues[8] ? cleanValues[8].split(';') : [],
+    password: generate6CharPIN() 
+};
+
+            try {
+    const response = await fetch(`${BASE_URL}/admin/register-user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+        successCount++;
+    } else {
+        errorCount++;
+        // THIS WILL SHOW THE ERROR ON SCREEN
+        const errorDiv = document.createElement('div');
+        errorDiv.style = "color: #b91c1c; background: #fee2e2; padding: 10px; margin-top: 5px; border-radius: 4px; font-size: 0.8rem;";
+        errorDiv.innerHTML = `<strong>Error (${payload.email}):</strong> ${result.error || 'Check if email exists'}`;
+        document.getElementById('enrollmentContent').appendChild(errorDiv);
+    }
+} catch (err) {
+    alert("Network error: Check if your server is running.");
+}
+        }
+
+        btn.disabled = false;
+        btn.innerText = "Upload";
+        fileInput.value = "";
+
+        if (errorCount > 0) {
+            console.log("Bulk Upload Errors:", errorMessages);
+            alert(`Completed with issues.\nSuccess: ${successCount}\nErrors: ${errorCount}\nCheck Console (F12) for details.`);
+        } else {
+            alert(`Success! ${successCount} candidates enrolled.`);
+        }
+        
+        if (typeof fetchUsers === 'function') fetchUsers();
+    };
+
+    reader.readAsText(fileInput.files[0]);
+}
+
+
+
+
+async function viewHistory(userId, firstName, lastName, regNo) {
+    // TEMPORARY DEBUG ALERT
+     alert("Function called for: " + regNo); 
+
+    const modal = document.getElementById('historyModal');
+    if (!modal) {
+        alert("Error: historyModal element not found in HTML!");
+        return;
+    }
+
+    // Force display
+    modal.style.setProperty('display', 'flex', 'important');
+    
+    document.getElementById('histName').innerText = `${lastName.toUpperCase()}, ${firstName}`;
+    document.getElementById('histReg').innerText = regNo;
+    
+    const content = document.getElementById('histContent');
+    content.innerHTML = '<div style="text-align:center; padding:20px;">⏳ Loading history...</div>';
+
+    try {
+        const res = await fetch(`${BASE_URL}/admin/user-history/${userId}`);
+        const data = await res.json();
+        
+        if (!data || data.length === 0) {
+            content.innerHTML = '<p style="text-align:center; color:#64748b; padding:20px;">No exams found.</p>';
+            return;
+        }
+
+        content.innerHTML = data.map(record => `
+            <div onclick="jumpToResult('${regNo}', '${record.examId}')" style="background:white; padding:12px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <b>${record.examId}</b>
+                    <span style="color:#059669; font-weight:bold;">${record.aggregateScore}</span>
+                </div>
+                <small style="color:#64748b;">${new Date(record.examDate).toLocaleDateString()}</small>
+            </div>
+        `).join('');
+    } catch (err) {
+        content.innerHTML = '<p style="color:red;">Failed to load records.</p>';
+    }
+}
+
+function closeHistory() {
+    document.getElementById('historyModal').style.display = 'none';
+}
+
+function jumpToResult(regNo, examId) {
+    closeHistory();
+    // 1. Switch Tab (Assuming your function is called showTab)
+    if (typeof showTab === 'function') showTab('results');
+
+    // 2. Set the filters in the Result Tab
+    const searchInput = document.getElementById('searchCandidate'); // The search box we built earlier
+    const examSelect = document.getElementById('filterExam');
+
+    if (searchInput) {
+        searchInput.value = regNo;
+    }
+    
+    if (examSelect) {
+        examSelect.value = examId;
+    }
+
+    // 3. Trigger the refresh
+    if (typeof fetchResults === 'function') fetchResults();
 }
 
 let currentEditingUserId = null;
@@ -1041,6 +1304,7 @@ async function loadUsers() {
         
         // FIX 2: Use 'data' consistently
         const data = await res.json(); 
+        window.lastFilteredUsers = data.users;
 
         if (!res.ok) throw new Error(data.error || "Failed to fetch");
 
@@ -1074,6 +1338,8 @@ const loginDisplay = u.lastLogin
 
                 // Use safer quotes for the JSON stringify in the onclick
                 const userJson = JSON.stringify(u).replace(/'/g, "&apos;");
+                const uFirstName = u.firstName.replace(/'/g, "\\'");
+                const uLastName = u.lastName.replace(/'/g, "\\'");
 
                 html += `
                 <tr style="border-bottom: 1px solid #e2e8f0;">
@@ -1098,7 +1364,8 @@ const loginDisplay = u.lastLogin
         ${loginDisplay}
     </td>
     <td>
-        <button onclick="viewHistory('${u._id}', '${u.firstName}')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 0.75rem;">
+        <button onclick="viewHistory('${u._id}', '${uFirstName}', '${uLastName}', '${u.regNo}')" 
+                style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 0.75rem;">
             Logs
         </button>
     </td>
@@ -1116,6 +1383,64 @@ const loginDisplay = u.lastLogin
         console.error("Load users Error:", e);
         tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; color:red; padding:20px;">Error loading student records.</td></tr>';
     }
+}
+
+function downloadUserCSV() {
+    const users = window.lastFilteredUsers;
+    if (!users || users.length === 0) {
+        return alert("No student records available to export.");
+    }
+
+    // Define the headers (Matching your table minus History and Actions)
+    const headers = [
+        "S/N", "Full Name", "Reg No", "PIN (Plain)", "Password (Hash)", 
+        "Gender", "Email", "Phone", "Course", "Level", "Subjects", 
+        "Date Registered", "Last Updated", "Last Login"
+    ];
+
+    // Build the CSV rows
+    const rows = users.map((u, index) => {
+        const fullName = `${u.lastName} ${u.firstName} ${u.middleName || ''}`.toUpperCase();
+        const subjects = u.subjectCombination ? u.subjectCombination.join('|') : 'N/A';
+        const regDate = new Date(u.createdAt).toLocaleString('en-GB');
+        const updateDate = new Date(u.updatedAt).toLocaleString('en-GB');
+        const loginDate = u.lastLogin ? new Date(u.lastLogin).toLocaleString('en-GB') : 'Never';
+
+        // Return array in same order as headers
+        return [
+            index + 1,
+            fullName,
+            u.regNo,
+            u.plainPassword || '---',
+            u.password,
+            u.gender,
+            u.email || 'N/A',
+            u.phone || 'N/A',
+            u.courseOfStudy,
+            u.classLevel,
+            subjects, // Using | as a separator for subjects to avoid CSV column breaking
+            regDate,
+            updateDate,
+            loginDate
+        ];
+    });
+
+    // Convert to CSV string
+    // We wrap each item in double quotes to handle any commas within the data
+    let csvContent = headers.join(",") + "\n";
+    rows.forEach(row => {
+        csvContent += row.map(field => `"${field}"`).join(",") + "\n";
+    });
+
+    // Trigger Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Registered_Users_${new Date().toLocaleDateString()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 
@@ -1470,6 +1795,135 @@ async function saveQuestion() {
     }
 }
 
+// 1. Template Downloader
+function downloadQuestionTemplate() {
+    // Exact column order required by the parser above
+    const headers = [
+        "subject", "topic", "subTopic", "subSubTopic", "passage", 
+        "questionText", "questionImage", 
+        "optA", "optAImg", "optB", "optBImg", "optC", "optCImg", "optD", "optDImg", "optE", "optEImg", 
+        "correctOptionKey", "weight"
+    ];
+    
+    const csvContent = headers.join(",") + "\n" + 
+    "Physics,Motion,Projectiles,,,\"A ball is thrown at 30°, calculate range.\",http://img-url.com/fig1.png,10m,,20m,,30m,,40m,,,B,1\n" +
+    "Use of English,Section A,Comprehension,The Lekki Headmaster,\"The headmaster was a tall man...\",Who was tall?, ,The cook, ,The teacher, ,The headmaster, ,The student, ,C,1";
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "Question_Bulk_Template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// 2. Main Processor
+async function processBulkQuestions() {
+    const fileInput = document.getElementById('bulkQFile');
+    const btn = document.getElementById('bulkQBtn');
+    
+    if (!fileInput.files[0]) return alert("Please select a CSV file.");
+    
+    btn.disabled = true;
+    btn.innerText = "⏳ Processing 20 questions...";
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const text = e.target.result;
+        const rows = text.split(/\r?\n/).filter(row => row.trim() !== '');
+        const dataRows = rows.slice(1); // Skip Header
+
+        let success = 0;
+        let fail = 0;
+
+        for (const row of dataRows) {
+            // PROPER CSV PARSER: Handles empty cells and quotes correctly
+            const v = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    v.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            v.push(current.trim()); // Push last column
+
+            // Basic validation: Check if we have enough columns (should be 19)
+            if (v.length < 18) {
+                console.warn("Row skipped due to length:", v.length, v);
+                fail++;
+                continue;
+            }
+
+            // CLEANUP: Remove surrounding quotes and handle double-double quotes ""
+            const cleanV = v.map(str => str.replace(/^"|"$/g, '').replace(/""/g, '"'));
+
+            const options = [];
+            const optMapping = [
+                { key: 'A', textIdx: 7,  imgIdx: 8 },
+                { key: 'B', textIdx: 9,  imgIdx: 10 },
+                { key: 'C', textIdx: 11, imgIdx: 12 },
+                { key: 'D', textIdx: 13, imgIdx: 14 },
+                { key: 'E', textIdx: 15, imgIdx: 16 }
+            ];
+
+            optMapping.forEach(opt => {
+                const text = cleanV[opt.textIdx];
+                if (text && text.trim() !== "") { 
+                    options.push({
+                        key: opt.key,
+                        value: text,
+                        optionImage: cleanV[opt.imgIdx] || ""
+                    });
+                }
+            });
+
+            const payload = {
+                subject: cleanV[0],
+                topic: cleanV[1],
+                subTopic: cleanV[2] || "",
+                subSubTopic: cleanV[3] || "",
+                passage: cleanV[4] || "",
+                questionText: cleanV[5],
+                questionImage: cleanV[6] || "",
+                options: options,
+                correctOptionKey: (cleanV[17] || "A").toUpperCase(),
+                weight: parseFloat(cleanV[18]) || 1
+            };
+
+            try {
+                const res = await fetch(`${BASE_URL}/questions`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) success++; else fail++;
+            } catch (err) {
+                fail++;
+            }
+        }
+
+        alert(`Upload Complete!\n✅ Success: ${success}\n❌ Failed: ${fail}`);
+        btn.disabled = false;
+        btn.innerText = "🚀 Upload Questions";
+        fileInput.value = "";
+        if (typeof loadQuestions === "function") loadQuestions();
+    };
+
+    reader.readAsText(fileInput.files[0]);
+}
+
+
+let currentLoadedQuestions = [];
 async function loadQuestions() {
     // 1. Get UI Elements safely
     const subFilter = document.getElementById('manageSubFilter');
@@ -1513,42 +1967,76 @@ async function loadQuestions() {
         }
 
         // 7. Render Rows
-        tableBody.innerHTML = questions.map((q, index) => {
-            const sn = index + 1;
-            const date = new Date(q.updatedAt || q.createdAt).toLocaleString('en-GB', {
-                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-            });
+// ... inside loadQuestions after filtering ...
+currentLoadedQuestions = questions; 
 
-            // Clean snippet for table
-            const snippet = (q.questionText || "").replace(/<[^>]*>/g, '').substring(0, 40);
-            const optSnippet = q.options.map(o => `[${o.key}: ${o.value.replace(/<[^>]*>/g, '').substring(0,10)}]`).join(' ');
-            const qData = JSON.stringify(q).replace(/'/g, "&apos;");
+const tableBody = document.getElementById('questionsTableBody');
+    tableBody.innerHTML = questions.map((q, index) => {
+        const sn = index + 1;
+        const date = new Date(q.updatedAt || q.createdAt).toLocaleDateString('en-GB', {
+            day: '2-digit', month: 'short'
+        });
 
-            return `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding:10px;">${sn}</td>
-                    <td style="padding:10px;">
-                        <b>${q.topic || 'No Topic'}</b><br>
-                        <small style="color:#6366f1">${q.subject}</small>
-                    </td>
-                    <td style="padding:10px;">
-                        <div class="table-scroll-cell">${q.questionText}</div>
-                        <div style="font-size:0.75rem; color:#64748b; margin-top:4px;">${optSnippet}</div>
-                    </td>
-                    <td style="padding:10px; font-size:0.8rem;">${date}</td>
-                    <td style="padding:10px; text-align:center;">
-                        <div style="display:flex; gap:5px; justify-content:center;">
-                            <button type="button" 
-                        onclick='prepareEdit(${qData})' 
-                        class="btn-edit-sm">
-                    Edit
-                </button>
-                            <button onclick="deleteQuestion('${q._id}', '${q.topic}')" class="btn-delete-sm">Delete</button>
-                        </div>
-                    </td>
-                </tr>
+        // Topic Hierarchy
+        const topicPath = [q.topic, q.subTopic, q.subSubTopic].filter(Boolean).join(' ➔ ');
+
+        // Options 2x2 Logic
+        const optionsHtml = q.options.map(o => {
+            const isCorrect = o.key === q.correctOptionKey;
+            const style = isCorrect 
+                ? 'background: #dcfce7; border: 1px solid #22c55e; color: #166534; font-weight: bold;' 
+                : 'background: #f8fafc; border: 1px solid #e2e8f0;';
+                return `
+                <div style="padding: 6px; border-radius: 6px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; ${style}">
+                    <span style="opacity: 0.7;">${o.key}:</span>
+                    <span style="flex: 1;">${o.value}</span>
+                    ${o.optionImage ? `<img src="${o.optionImage}" style="height: 20px; border-radius: 2px;">` : ''}
+                    ${isCorrect ? '✅' : ''}
+                </div>
             `;
         }).join('');
+
+        const qData = JSON.stringify(q).replace(/'/g, "&apos;");
+
+        return `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 10px; width: 20px; text-align: center;">
+                    <input type="checkbox" class="q-checkbox" value="${q._id}" onclick="updateBulkBar()">
+                </td>
+                <td style="padding: 10px; width: 20px; font-size: 0.8rem; color:
+                #64748b;">${sn}</td>
+                
+                <td style="padding: 10px; width: 50px;">
+                    <div style="font-weight: 500; font-size: 0.85rem;
+                    line-height: 1.5;">${topicPath}</div>
+                    <div style="color: #6366f1; font-size: 0.7rem; font-weight: bold; margin-top: 4px; text-transform: uppercase;">
+                        ${q.subject}
+                    </div>
+                </td>
+
+                <td style="padding: 10px; width: 100px;">
+                    <div class="content-scroll">
+                        <div style="font-weight: 450; margin-bottom: 8px; color: #1e293b;">${q.questionText}</div>
+                        ${q.questionImage ? `<img src="${q.questionImage}" style="max-height: 100px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #ddd;">` : ''}
+                        
+                        <div class="options-preview-grid">
+                            ${optionsHtml}
+                        </div>
+                    </div>
+                </td>
+
+                <td style="padding: 10px; width: 50px; font-size: 0.75rem; color: #94a3b8; text-align: center;">
+                    ${date}
+                </td>
+                <td style="padding: 10px; width: 100px; text-align: center;">
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <button onclick='prepareEdit(${qData})' class="btn-edit-sm" style="padding: 4px 8px;">Edit</button>
+                        <button onclick="deleteQuestion('${q._id}', '${q.topic}')" class="btn-delete-sm" style="padding: 4px 8px; font-size: 0.7rem;">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 
         // 8. Re-trigger MathJax for LaTeX in the table
         if (window.MathJax && MathJax.typesetPromise) {
@@ -1561,6 +2049,91 @@ async function loadQuestions() {
             Failed to load questions. Check your server connection.
         </td></tr>`;
     }
+}
+
+function toggleSelectAll(masterSource) {
+    const checkboxes = document.querySelectorAll('.q-checkbox');
+    checkboxes.forEach(cb => cb.checked = masterSource.checked);
+    updateBulkBar();
+}
+
+function updateBulkBar() {
+    const selected = document.querySelectorAll('.q-checkbox:checked');
+    const bar = document.getElementById('bulkActionBar');
+    const countSpan = document.getElementById('selectedCount');
+    
+    if (selected.length > 0) {
+        bar.style.display = 'flex';
+        countSpan.innerText = `${selected.length} question(s) selected`;
+    } else {
+        bar.style.display = 'none';
+    }
+}
+
+async function deleteSelectedQuestions() {
+    const selected = Array.from(document.querySelectorAll('.q-checkbox:checked')).map(cb => cb.value);
+    
+    if (!confirm(`Are you sure you want to delete ${selected.length} questions? This cannot be undone.`)) return;
+
+    // We use Promise.all to delete everything in parallel
+    try {
+        const deletePromises = selected.map(id => 
+            fetch(`${BASE_URL}/questions/${id}`, { method: 'DELETE' })
+        );
+        
+        await Promise.all(deletePromises);
+        alert("Selected questions deleted successfully.");
+        loadQuestions(); // Refresh the list
+        document.getElementById('selectAllCheck').checked = false;
+        updateBulkBar();
+    } catch (err) {
+        alert("Error during bulk deletion. Some items might not have been removed.");
+    }
+}
+
+function exportQuestionsCSV() {
+    if (currentLoadedQuestions.length === 0) return alert("No questions to export.");
+
+    const headers = ["subject", "topic", "subTopic", "subSubTopic", "passage", "questionText", "questionImage", "optA", "optAImg", "optB", "optBImg", "optC", "optCImg", "optD", "optDImg", "optE", "optEImg", "correctOptionKey", "weight"];
+    
+    const rows = currentLoadedQuestions.map(q => {
+        // Extract options to match the CSV structure
+        const optA = q.options.find(o => o.key === 'A') || {};
+        const optB = q.options.find(o => o.key === 'B') || {};
+        const optC = q.options.find(o => o.key === 'C') || {};
+        const optD = q.options.find(o => o.key === 'D') || {};
+        const optE = q.options.find(o => o.key === 'E') || {};
+
+        return [
+            q.subject,
+            q.topic || "",
+            q.subTopic || "",
+            q.subSubTopic || "",
+            (q.passage || "").replace(/"/g, '""'), // Escape quotes for CSV
+            (q.questionText || "").replace(/"/g, '""'),
+            q.questionImage || "",
+            (optA.value || "").replace(/"/g, '""'), optA.optionImage || "",
+            (optB.value || "").replace(/"/g, '""'), optB.optionImage || "",
+            (optC.value || "").replace(/"/g, '""'), optC.optionImage || "",
+            (optD.value || "").replace(/"/g, '""'), optD.optionImage || "",
+            (optE.value || "").replace(/"/g, '""'), optE.optionImage || "",
+            q.correctOptionKey,
+            q.weight
+        ];
+    });
+
+    let csvContent = headers.join(",") + "\n";
+    rows.forEach(row => {
+        csvContent += row.map(field => `"${field}"`).join(",") + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `Question_Library_Export_${new Date().toLocaleDateString()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function prepareEdit(q) {
@@ -1740,86 +2313,285 @@ function closeQModal() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
     
-    
+    function updateAnalytics(filteredData) {
+    const totalElement = document.getElementById('statTotal');
+    const highElement = document.getElementById('statHigh');
+    const avgElement = document.getElementById('statAvg');
 
-//----- FETCH RESULTS ----
-async function fetchResults() {
-  const tbody = document.getElementById('adminResultBody');
-        tbody.innerHTML = "<tr><td colspan='5'>Waking up Render server... please wait...</td></tr>";
-        try {
-            const res = await fetch(`${BASE_URL}/all-results`);
-            const data = await res.json();
-            const uniqueUsers = new Set(data.map(r => r.userId?._id));
-    document.getElementById('statTotal').innerText = uniqueUsers.size;
-            const body = document.getElementById('adminResultBody');
-            const scores = data.map(r => r.aggregateScore);
-            document.getElementById('statHigh').innerText = Math.max(...scores, 0);
-            const avg = scores.reduce((a,b) => a+b, 0) / (scores.length || 1);
-            document.getElementById('statAvg').innerText = avg.toFixed(1);
+    // 1. Total Candidates
+    const total = filteredData.length;
+    totalElement.innerText = total;
 
-            body.innerHTML = data.map((r, i) => `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td><strong>${r.userId?.regNumber || 'N/A'}</strong></td>
-                    <td>${r.userId?.lastName || ''}, ${r.userId?.firstName || ''}</td>
-                    <td>
-                        ${r.subjectResults.map(sr => `
-                           <button class="badge-btn"
-                                  onclick="viewScript('${r._id}', '${sr.subjectName}')"
-                          >
-                                ${sr.subjectName}: ${sr.weightedScore}
-                            </button>
-                        `).join('')}
-                    </td>
-                    <td><strong style="color:#059669">${r.aggregateScore}</strong></td>
-                    <td>${r.timeUsed || '--'}m</td>
-                    <td>${new Date(r.examDate).toLocaleDateString()}</td>
-                </tr>
-            `).join('');
-        } catch (e) { tbody.innerHTML = "<tr><td colspan='5'>Error fetching results.</td></tr>"; }
+    if (total === 0) {
+        highElement.innerText = "0";
+        avgElement.innerText = "0";
+        return;
     }
 
+    // 2. Highest Score
+    const scores = filteredData.map(r => r.aggregateScore || 0);
+    const highest = Math.max(...scores);
+    highElement.innerText = highest;
+
+    // 3. Average Aggregate
+    const sum = scores.reduce((a, b) => a + b, 0);
+    const average = (sum / total).toFixed(1);
+    avgElement.innerText = average;
+}
+
+//----- FETCH RESULTS ----
+// Global storage
+let allFetchedResults = [];
+
+async function fetchResults() {
+    const tbody = document.getElementById('adminResultBody');
+    const examFilter = document.getElementById('filterExam').value;
+    const batchFilter = document.getElementById('filterBatch').value;
+    const searchVal = document.getElementById('searchCandidate').value.toLowerCase();
+
+    try {
+        // Only fetch from server if we don't have data yet (or force refresh)
+        if (allFetchedResults.length === 0) {
+            const res = await fetch(`${BASE_URL}/all-results`);
+            allFetchedResults = await res.json();
+            populateExamDropdown(allFetchedResults);
+        }
+
+        let filtered = allFetchedResults;
+
+        // Apply Filters
+        if (examFilter !== 'all') filtered = filtered.filter(r => r.examId === examFilter);
+        if (batchFilter !== 'all') filtered = filtered.filter(r => String(r.batchId) === batchFilter);
+        
+        // Apply Search (Reg No or Name)
+        if (searchVal) {
+            filtered = filtered.filter(r => {
+                const fullName = `${r.userId?.lastName} ${r.userId?.firstName}`.toLowerCase();
+                const reg = (r.userId?.regNumber || '').toLowerCase();
+                return fullName.includes(searchVal) || reg.includes(searchVal);
+            });
+        }
+
+        window.currentFilteredResults = filtered;
+        updateAnalytics(filtered);
+
+        tbody.innerHTML = filtered.map((r, i) => {
+            const u = r.userId || {};
+            const fullName = `${(u.lastName || '').toUpperCase()}, ${u.firstName || ''} ${u.middleName || ''}`;
+            const genderBadge = u.gender ? `<span style="font-size:0.7rem; background:#e2e8f0; padding:2px 6px; border-radius:4px; margin-left:5px;">${u.gender.toUpperCase()}</span>` : '';
+
+            return `
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:15px;">${i + 1}</td>
+                    <td style="padding:15px;">
+                        <div style="font-weight:bold; color:#1e293b;">${u.regNumber || '---'}</div>
+                        <div style="font-size:0.9rem; color:#64748b;">${fullName}${genderBadge}</div>
+                    </td>
+                    <td style="padding:15px;">Batch ${r.batchId}</td>
+                    <td style="padding:15px;">
+                        <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                            ${r.subjectResults.map(sr => `
+                                <div onclick="viewScript('${r._id}', '${sr.subjectName}', '${fullName}')" 
+                                     title="Click to view script"
+                                     style="background:#f0f9ff; border:1px solid
+                                     #dcfce7; color:#166534; padding:8px 8px;
+                                     border-radius:6px; cursor:pointer;
+                                     font-size:0.9rem;">
+                                    <b>${sr.subjectName.substring(0,3).toUpperCase()}:</b> ${sr.normalizedScore2}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </td>
+                    <td style="padding:15px;">
+                        <span style="font-size:1.1rem; font-weight:800; color:#2563eb;">${r.aggregateScore}</span>
+                    </td>
+                    <td style="padding:15px;">
+                        <button class="tool-btn" onclick="generateResultSlip(event, '${r._id}')" style="background:#6366f1; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.8rem;">
+                            Print Result Slip
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (e) {
+        tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>Error loading data.</td></tr>";
+    }
+}
+
+// Helper: Populate Exam Dropdown based on results found
+function populateExamDropdown(data) {
+    const select = document.getElementById('filterExam');
+    const uniqueExams = [...new Set(data.map(r => r.examId))];
+    // You might want to map these IDs to real names if you have an exam title map
+    select.innerHTML = '<option value="all">All Exams</option>' + 
+        uniqueExams.map(id => `<option value="${id}">${id}</option>`).join('');
+}
+
+function downloadCSV() {
+    const data = window.currentFilteredResults;
+    if (!data || data.length === 0) return alert("No data to export");
+
+    // Get unique subjects across all filtered results
+    const subjectList = [...new Set(data.flatMap(r => r.subjectResults.map(s => s.subjectName)))];
+
+    // CSV Header
+    let csv = "Rank,RegNumber,LastName,FirstName,Gender,Batch," + subjectList.join(",") + ",AggregateScore,Date\n";
+
+    // CSV Body
+    data.forEach((r, i) => {
+        const u = r.userId || {};
+        let row = [
+            i + 1,
+            u.regNumber || 'N/A',
+            (u.lastName || '').toUpperCase(),
+            u.firstName || '',
+            u.gender || '',
+            r.batchId
+        ];
+
+        // Fill subject scores
+        subjectList.forEach(subName => {
+            const found = r.subjectResults.find(s => s.subjectName === subName);
+            row.push(found ? found.normalizedScore2 : 0);
+        });
+
+        row.push(r.aggregateScore);
+        row.push(new Date(r.examDate).toLocaleDateString());
+
+        // Join with comma and wrap fields in quotes to prevent column break
+        csv += row.map(field => `"${field}"`).join(",") + "\n";
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `MathWorkshop_Results_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 //----- VIEW SCRIPT -----
-async function viewScript(resultId, subject) {
+function closeScriptModal() {
+    const modal = document.getElementById('scriptModal');
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+}
+
+async function viewScript(resultId, subject, studentName) {
     const modal = document.getElementById('scriptModal');
     const content = document.getElementById('modalContent');
+    const title = document.getElementById('modalTitle');
     
-    content.innerHTML = "<p>Loading detailed script...</p>";
+    modal.style.display = 'flex';
     modal.classList.remove('hidden');
+    // Set Header: "LAST NAME, First Name (Subject)"
+    title.innerText = `${studentName} - ${subject}`; 
+    content.innerHTML = '<div style="text-align:center; padding:30px;">Loading Review...</div>';
 
     try {
         const res = await fetch(`${BASE_URL}/admin/view-script/${resultId}/${subject}`);
         const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
 
-        document.getElementById('modalTitle').innerText = `${subject} Review - ${data.questions.length} Questions`;
+        // 1. Calculate the Raw Score accurately from the fetched questions
+        const totalQuestionsServiced = data.questions.length;
+        const correctCount = data.questions.filter(q => q.isCorrect).length;
+        
+        // 2. Set the Standard Total (Denominator)
+        const standardTotal = (subject.toLowerCase().includes('english')) ? 60 : 40;
 
-        content.innerHTML = data.questions.map((q, i) => `
-            <div style="margin-bottom: 25px; padding: 15px; border-bottom: 1px solid #eee; background: ${q.selectedKey ? (q.isCorrect ? '#f0fff4' : '#fff5f5') : '#f8fafc'}">
-                <p><strong>Q${i+1}:</strong> ${q.questionText}</p>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:10px 0;">
-                    ${q.options.map(opt => `
-                        <div style="padding:8px; border:1px solid #ddd; border-radius:4px; 
-                             ${opt.key === q.correctKey ? 'border-color:#10b981; background:#d1fae5;' : ''}
-                             ${opt.key === q.selectedKey && opt.key !== q.correctKey ? 'border-color:#ef4444; background:#fee2e2;' : ''}">
-                            <strong>${opt.key}:</strong> ${opt.value}
-                        </div>
-                    `).join('')}
+        let html = `
+            <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:15px; display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; text-align:center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <div style="border-right:1px solid #eee;">
+                    <small style="color:#64748b; font-size:0.65rem; display:block; font-weight:700;">RAW SCORE</small>
+                    <strong style="font-size:1rem;">${correctCount} / ${standardTotal}</strong>
                 </div>
-                <p style="font-size:0.9rem;">
-                    <strong>Student Picked:</strong> ${q.selectedKey || 'Skipped'} | 
-                    <span style="color:${q.isCorrect ? 'green' : 'red'}">${q.isCorrect ? 'CORRECT' : 'WRONG'}</span>
-                </p>
-                ${q.explanation ? `<small style="color:#64748b;"><em>Explanation: ${q.explanation}</em></small>` : ''}
+                <div style="border-right:1px solid #eee;">
+                    <small style="color:#64748b; font-size:0.65rem; display:block; font-weight:700;">PERCENT</small>
+                    <strong style="font-size:1rem; color:#10b981;">${(data.stats.weighted || 0).toFixed(1)}%</strong>
+                </div>
+                <div>
+                    <small style="color:#64748b; font-size:0.65rem; display:block; font-weight:700;">JAMB SCALE</small>
+                    <strong style="font-size:1rem; color:#2563eb;">${data.stats.normalized || 0}</strong>
+                </div>
             </div>
-        `).join('');
+        `;
 
+        // ... logic for summary header ends here ...
+
+if (totalQuestionsServiced === 0) {
+    html += `<p style="text-align:center; padding:20px;">No responses found.</p>`;
+} else {
+    let lastPassage = ""; // Track the current passage to avoid repetition
+
+    data.questions.forEach((q, i) => {
+        const isSkipped = !q.selectedKey;
+        const statusColor = isSkipped ? '#94a3b8' : (q.isCorrect ? '#10b981' : '#ef4444');
+        
+        // 1. Handle "Use of English" Passages (Comprehension/Cloze)
+        // Only show the passage if it's different from the previous question's passage
+        if (q.passage && q.passage.trim() !== "" && q.passage !== lastPassage) {
+            html += `
+                <div style="background:#fff7ed; border:1px solid #ffedd5; padding:15px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; color:#9a3412; line-height:1.6;">
+                    <b style="display:block; margin-bottom:5px; color:#c2410c;">Read the passage below:</b>
+                    ${q.passage}
+                </div>
+            `;
+            lastPassage = q.passage; // Update tracker
+        }
+        const qImg = q.questionImage ? `
+    <div style="margin: 10px 0; text-align:center;">
+        <img src="${q.questionImage}" style="max-width:100%; max-height:200px; border-radius:5px; border:1px solid #eee;">
+    </div>` : '';
+    const optionsHtml = `
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+        ${q.options.map(opt => {
+            const isCorrect = opt.key === q.correctKey;
+            const isSelected = opt.key === q.selectedKey;
+            
+            let style = "padding:10px; border-radius:6px; border:1.5px solid #f1f5f9; font-size:0.85rem; display:flex; flex-direction:column; align-items:center; text-align:center;";
+            
+            if (isCorrect) style += "background:#d1fae5; border-color:#10b981; font-weight:600; color:#065f46;";
+            if (isSelected && !isCorrect) style += "background:#fee2e2; border-color:#ef4444; color:#991b1b;";
+            
+            return `
+                <div style="${style}">
+                    <div style="width:100%; text-align:left; margin-bottom:5px;"><b>${opt.key}</b></div>
+                    ${opt.image ? `<img src="${opt.image}" style="max-width:100%; height:auto; max-height:80px; margin-bottom:5px; border-radius:3px;">` : ''}
+                    <span>${opt.value}</span>
+                </div>`;
+        }).join('')}
+    </div>
+`;
+
+        html += `
+            <div style="background:white; border:1px solid #e2e8f0; border-left:5px solid ${statusColor}; padding:15px; border-radius:8px; margin-bottom:12px;">
+                
+                <div style="margin-bottom:10px; font-weight:500; line-height:1.4; color:#1e293b;">
+                    <span style="color:#64748b; margin-right:5px;">Q${i+1}.</span> 
+                    ${q.questionText}
+                </div>
+                  ${qImg}
+                  ${optionsHtml}
+                
+
+                <div style="margin-top:12px; font-size:0.75rem; color:#64748b; border-top:1px dashed #eee; padding-top:8px; display:flex; justify-content:space-between;">
+                    <span>Status: <b>${isSkipped ? 'Skipped' : (q.isCorrect ? 'Correct' : 'Incorrect')}</b></span>
+                    <span>Correct Answer: <b style="color:#10b981;">${q.correctKey}</b></span>
+                </div>
+            </div>`;
+    });
+}
+// ... rest of the function (MathJax, content.innerHTML) ...
+
+        content.innerHTML = html;
         if (window.MathJax) MathJax.typesetPromise();
-
     } catch (err) {
-        content.innerHTML = "<p style='color:red;'>Error loading script. Check console.</p>";
+        content.innerHTML = `<p style="color:red; text-align:center; padding:20px;">${err.message}</p>`;
     }
 }
+
 
 
 //---- UTILS -----
@@ -1844,9 +2616,7 @@ function execCmd(command) { document.execCommand(command, false, null); }
     
     element.focus(); // Place the cursor back in the field for convenience
 }
-    function closeModal() { document.getElementById('scriptModal').classList.add('hidden'); }
-
-
+    
 // ---- OTHERS ----
     async function checkTopicCount() {
         const sub = document.getElementById('qSubject').value;
@@ -2332,12 +3102,21 @@ let assignmentType = "Custom";
 function generateBatchUI() {
     const count = document.getElementById('exBatchCount').value;
     const container = document.getElementById('batchContainer');
+    const generalStartDate = document.getElementById('exStart').value.split('T')[0]; // Gets YYYY-MM-DD
+    
     container.innerHTML = '';
     for (let i = 1; i <= count; i++) {
         container.innerHTML += `
-            <div class="batch-row" style="background:#fff; padding:8px; border:1px solid #eee; border-radius:5px;">
-                <small>Batch ${i}</small><br>
-                <input type="time" class="b-start" title="Start"> to <input type="time" class="b-end" title="End">
+            <div class="batch-row" style="background:#f8fafc; padding:10px; border:1px solid #e2e8f0; border-radius:8px; display:flex; flex-direction:column; gap:5px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="color:var(--primary);">Batch ${i}</strong>
+                    <input type="date" class="b-date" value="${generalStartDate || ''}" style="width:130px; padding:2px;">
+                </div>
+                <div style="display:flex; align-items:center; gap:5px; font-size:0.85rem;">
+                    <input type="time" class="b-start" title="Start Time" style="flex:1;">
+                    <span>to</span>
+                    <input type="time" class="b-end" title="End Time" style="flex:1;">
+                </div>
             </div>`;
     }
 }
@@ -2432,17 +3211,22 @@ async function saveExamSettings() {
     btn.innerText = "Saving... Please wait";
     btn.style.opacity = "0.7";
 
-    const batches = [];
-    document.querySelectorAll('.b-start').forEach((el, i) => {
-        const endEl = document.querySelectorAll('.b-end')[i];
-        if (el.value && endEl.value) {
-            batches.push({
-                batchNumber: i + 1,
-                startTime: el.value,
-                endTime: endEl.value
-            });
-        }
-    });
+    // Inside saveExamSettings function, update the batch collection:
+const batches = [];
+document.querySelectorAll('.batch-row').forEach((row, i) => {
+    const date = row.querySelector('.b-date').value;
+    const start = row.querySelector('.b-start').value;
+    const end = row.querySelector('.b-end').value;
+    
+    if (date && start && end) {
+        batches.push({
+            batchNumber: i + 1,
+            // Store as ISO strings combined with date
+            startTime: `${date}T${start}:00`, 
+            endTime: `${date}T${end}:00`
+        });
+    }
+});
 
     const payload = {
         id: editId || null, // CRITICAL: This tells the backend to UPDATE if ID exists
@@ -2833,51 +3617,251 @@ function removeStudent(regNo) {
 // BATCHES Distribution
 
 async function shuffleAndDistribute(examId) {
-    if (!confirm("This will randomly assign all selected students to the available batches. Continue?")) return;
+    const choice = confirm("Click OK to distribute only UNASSIGNED students.\nClick CANCEL to CLEAR ALL and do a fresh distribution.");
+    
+    // choice === true means add new people
+    // choice === false means reset and re-shuffle
+    const clearAll = !choice; 
 
     try {
         const res = await fetch(`${BASE_URL}/api/exams/distribute-batches/${examId}`, {
-            method: 'POST'
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clearAll: clearAll })
         });
         const result = await res.json();
         
         if (res.ok) {
-            alert(`Success! ${result.count} students have been distributed across ${result.batches} batches.`);
-            loadExams(); // Refresh table to show updated status
-        } else {
-            alert("Error: " + result.error);
+            alert(result.message);
+            loadExams();
         }
     } catch (err) {
-        console.error(err);
-        alert("Server error during distribution.");
+        alert("Server error.");
     }
 }
 
 async function sendSchedules(examId, examTitle) {
-    // First Confirmation
-    const step1 = confirm(`PREPARING TO SEND EMAILS for: ${examTitle}\n\nThis will send login details to all assigned students. Proceed?`);
-    if (!step1) return;
+    const isTest = confirm("Run in TEST MODE?\n\nOK: Send ALL emails to YOUR developer email.\nCANCEL: Send to REAL student emails.");
+    
+    let testEmail = null;
+    if (isTest) {
+        testEmail = prompt("Enter the email address where all test notifications should be sent:");
+        if (!testEmail) return;
+    } else {
+        const finalCheck = confirm(`DANGER: You are about to email ${examTitle} schedules to EVERY student. Are you sure?`);
+        if (!finalCheck) return;
+    }
 
-    // Second Strategic Confirmation
-    const step2 = confirm("FINAL CHECK: Are your Batch Times and Student List 100% correct? This action cannot be undone.");
-    if (!step2) return;
-
-    // Visual loading state
     const btn = event.target;
-    const oldText = btn.innerText;
-    btn.innerText = "📧 Sending...";
+    btn.innerText = "📧 Dispatching...";
     btn.disabled = true;
 
     try {
-        const res = await fetch(`${BASE_URL}/api/exams/notify-students/${examId}`, { method: 'POST' });
+        const res = await fetch(`${BASE_URL}/api/exams/notify-students/${examId}`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ testEmail: testEmail })
+        });
+        
         if (res.ok) {
-            alert("Email dispatch started! Students will receive their schedules shortly.");
+            alert(isTest ? "Test emails are being sent to you!" : "Official dispatch started!");
         }
     } catch (err) {
-        alert("Email service failed.");
+        alert("Email service connection failed.");
     } finally {
-        btn.innerText = oldText;
+        btn.innerText = "Send Schedules";
         btn.disabled = false;
+    }
+}
+
+
+async function generateResultSlip(event, resultId) {
+    const btn = event.currentTarget;
+    const originalText = btn.innerText;
+    btn.innerText = "⏳ Building Transcript...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch(`${BASE_URL}/results/${resultId}`);
+        const data = await res.json();
+
+        const element = document.createElement('div');
+        element.style = "width: 185mm; padding: 12mm; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background: white; color: #1e293b;";
+
+        const fmtT = (s) => (s && s > 0) ? `${Math.floor(s/60)}m ${s%60}s` : "0m 0s";
+        
+        // Grouping logic for the scripts
+        const grouped = data.detailedAnswers.reduce((acc, curr) => {
+            (acc[curr.subject] = acc[curr.subject] || []).push(curr);
+            return acc;
+        }, {});
+
+        element.innerHTML = `
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #312e81 100%); padding: 35px; border-radius: 24px; color: white; margin-bottom: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="margin: 0; font-size: 9pt; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8;">CBT Performance Report</h2>
+                    <h1 style="margin: 5px 0 0 0; font-size: 24pt; font-weight: 800; letter-spacing: -0.5px;">OFFICIAL TRANSCRIPT</h1>
+                </div>
+                <div style="text-align: right; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 25px;">
+                    <div style="font-size: 42pt; font-weight: 900; color: #a5b4fc; line-height: 1;">${data.aggregateScore}</div>
+                    <div style="font-size: 8pt; letter-spacing: 2px; font-weight: bold; opacity: 0.7;">TOTAL SCORE</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 35px;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px;">
+                    <span style="font-size: 7pt; color: #64748b; font-weight: 800; text-transform: uppercase;">Candidate</span>
+                    <div style="font-size: 11pt; font-weight: 700; color: #0f172a; margin-top: 4px;">${data.studentName}</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px;">
+                    <span style="font-size: 7pt; color: #64748b; font-weight: 800; text-transform: uppercase;">Registration No</span>
+                    <div style="font-size: 11pt; font-weight: 700; color: #4338ca; margin-top: 4px;">${data.regNo}</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px;">
+                    <span style="font-size: 7pt; color: #64748b; font-weight: 800; text-transform: uppercase;">Exam Session</span>
+                    <div style="font-size: 9pt; font-weight: 600; color: #0f172a; margin-top: 4px;">${new Date(data.examDate).toLocaleDateString()}</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 45px;">
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0 8px;">
+                    <thead>
+                        <tr style="color: #64748b; font-size: 8.5pt; text-transform: uppercase; font-weight: 800;">
+                            <th style="text-align: left; padding-left: 10px;">Subject</th>
+                            <th style="text-align: center;">Accuracy</th>
+                            <th style="text-align: center;">Time Spent</th>
+                            <th style="text-align: right; padding-right: 10px;">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.subjectScores.map(s => `
+                            <tr style="background: #ffffff; outline: 1px solid #e2e8f0; border-radius: 10px;">
+                                <td style="padding: 15px; font-weight: 800; border-radius: 10px 0 0 10px;">${s.name}</td>
+                                <td style="text-align: center; color: #0f172a;">${s.correct} / ${s.total}</td>
+                                <td style="text-align: center; color: #64748b;">${fmtT(s.timeSpent)}</td>
+                                <td style="text-align: right; padding-right: 15px; font-weight: 900; color: #4338ca; border-radius: 0 10px 10px 0;">${s.score}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="page-break-before: auto;">
+                <h3 style="font-size: 14pt; font-weight: 800; color: #1e293b; border-bottom: 4px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 30px;">Item-by-Item Review</h3>
+                
+                ${Object.keys(grouped).map(subject => {
+                    let lastPassage = ""; // Tracker for this subject
+                    return `
+                    <div style="margin-bottom: 40px;">
+                        <div style="background: #1e293b; color: white; padding: 6px 16px; border-radius: 20px; font-size: 8.5pt; font-weight: 800; display: inline-block; margin-bottom: 20px; letter-spacing: 1px;">
+                            ${subject.toUpperCase()}
+                        </div>
+                        
+                        ${grouped[subject].map((ans, i) => {
+                            let passageBox = "";
+                            // Smart passage display
+                            if (ans.passage && ans.passage.trim().length > 5 && ans.passage.trim() !== lastPassage) {
+                                passageBox = `
+                                    <div style="background: #fefce8; border-left: 5px solid #eab308; padding: 18px; margin-bottom: 20px; border-radius: 8px; font-size: 10pt; line-height: 1.7; color: #854d0e; font-style: italic; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                                        <b style="color: #a16207; font-size: 8pt; display: block; margin-bottom: 8px; text-transform: uppercase;">Passage Section:</b>
+                                        ${ans.passage}
+                                    </div>
+                                `;
+                                lastPassage = ans.passage.trim();
+                            }
+
+                            return `
+                                <div style="margin-bottom: 20px; padding: 20px; border: 1px solid #f1f5f9; border-radius: 15px; background: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+                                    ${passageBox}
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                        <span style="font-size: 8pt; font-weight: 800; color: #94a3b8;">QUESTION ${i+1}</span>
+                                        <span style="font-size: 8pt; font-weight: 900; color: ${ans.isCorrect ? '#22c55e' : '#ef4444'};">
+                                            ${ans.isCorrect ? '✓ ATTRIBUTE CORRECT' : '✘ ATTRIBUTE INCORRECT'}
+                                        </span>
+                                    </div>
+                                    <p style="margin: 0; font-size: 10.5pt; color: #334155; line-height: 1.6; font-weight: 500;">${ans.questionText}</p>
+                                    ${ans.questionImage ? `<img src="${ans.questionImage}" style="max-height: 140px; margin-top: 15px; border-radius: 8px; border: 1px solid #f1f5f9;">` : ''}
+                                    
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                                        ${ans.options.map(opt => {
+                                            const isCorrect = opt.key === ans.correctKey;
+                                            const isUser = opt.key === ans.userChoice;
+                                            let borderStyle = "1px solid #e2e8f0";
+                                            let bgColor = "#ffffff";
+                                            if(isCorrect) { borderStyle = "2px solid #22c55e"; bgColor = "#f0fdf4"; }
+                                            else if(isUser) { borderStyle = "2px solid #ef4444"; bgColor = "#fef2f2"; }
+
+                                            return `
+                                                <div style="padding: 10px; border: ${borderStyle}; background: ${bgColor}; border-radius: 10px; font-size: 9pt; display: flex; align-items: center; justify-content: space-between;">
+                                                    <span><b style="color: #64748b; margin-right: 8px;">${opt.key}</b> ${opt.value}</span>
+                                                    ${opt.optionImage ? `<img src="${opt.optionImage}" style="height: 30px; border-radius: 4px;">` : ''}
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>`;
+                }).join('')}
+            </div>
+        `;
+
+        // PDF Generation
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        await doc.html(element, {
+            callback: (doc) => {
+                doc.save(`${data.regNo}_Performance_Report.pdf`);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            },
+            x: 5, y: 5, width: 195, windowWidth: 800
+        });
+
+    } catch (err) {
+        console.error("PDF Error:", err);
+        alert("Transcript generation failed. Check the console for details.");
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+}
+
+
+async function publishResults(isTest) {
+    const selected = Array.from(document.querySelectorAll('.result-checkbox:checked')).map(cb => cb.value);
+    
+    if (selected.length === 0) {
+        return alert("Please select at least one result from the table.");
+    }
+
+    const confirmMsg = isTest 
+        ? "Send a test email to the selected candidate(s)?" 
+        : `Publish results and notify ${selected.length} candidates? This action cannot be undone.`;
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const res = await fetch(`${BASE_URL}/results/publish`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                resultIds: isTest ? [selected[0]] : selected, // Only first one for test
+                isTest: isTest 
+            })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            alert(data.message);
+            if (!isTest) loadResults(); // Refresh table
+        } else {
+            throw new Error(data.error);
+        }
+    } catch (err) {
+        console.error("Publication Error:", err);
+        alert("Failed to process request. Check console.");
     }
 }
 

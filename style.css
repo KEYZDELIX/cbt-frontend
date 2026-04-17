@@ -496,3 +496,64 @@ td div small, td div {
     }
     
 }
+
+/* Ensure the manage questions table handles rich content well */
+#questionsTableBody tr:hover {
+    background-color: #f1f5f9;
+}
+
+.table-scroll-cell {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.table-scroll-cell::-webkit-scrollbar {
+    width: 4px;
+}
+
+.table-scroll-cell::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* Make action buttons stack nicely on mobile */
+@media (max-width: 768px) {
+    .btn-edit-sm, .btn-delete-sm {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+}
+
+/* Make the table stretch to screen and fix column proportions */
+/*.manage-table {
+    width: 100%;
+    table-layout: fixed; /* Forces the browser to respect our widths 
+    border-collapse: collapse;
+}
+
+.manage-table th, .manage-table td {
+    overflow: auto;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+*/
+
+/* Grid for the 2x2 Options */
+.options-preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 4px;
+    margin-top: 10px;
+}
+
+/* If there is an odd number (like Option E), let it span full width or stay in one col */
+.options-preview-grid > div:nth-child(5) {
+    grid-column: span 2;
+}
+
+/* Scrollable container for long questions */
+.content-scroll {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 6px;
+}

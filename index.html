@@ -157,7 +157,25 @@
             <button class="btn-main" style="background: var(--accent);" onclick="confirmSubmit()">SUBMIT EXAM</button>
         </aside>
     </div>
+</div><div id="resultPage" class="hidden auth-container" style="max-width: 450px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 40px; color: #4CAF50;">✔</div>
+        <h2 id="resultHeader">Submission Received</h2>
+        <p style="color: #666;">Here is your raw performance summary:</p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; background: #f9f9f9; border-radius: 8px;">
+        <tbody id="resultBody">
+            </tbody>
+    </table>
+
+    <div style="margin-top: 25px; font-size: 0.85rem; color: #888; text-align: center;">
+        <p>Your official STT normalized JAMB Mock score and full script will be
+        released shortly. Ensure you check your email.</p>
+        <button class="btn-main" onclick="location.reload()" style="margin-top: 15px;">Close Portal</button>
+    </div>
 </div>
+
 
 <script>
     const BASE_URL = "https://cbt-backend-mgqe.onrender.com"; let saveTimeout;
@@ -226,6 +244,7 @@ function preparePayload(status = "active") {
 
             state.userId = data.user._id;
             state.userRegNo = data.user.regNo;
+            state.allocatedExamId = data.allocation.examId;
             state.examId = data.resumeSessionId || null;
 
             const fullName = [data.user.firstName, data.user.middleName, data.user.lastName].filter(Boolean).join(' ');
@@ -259,56 +278,46 @@ function preparePayload(status = "active") {
     // --- EXAM CORE (Fixed the initiateExam syntax) ---
     async function initiateExam() {
     const proceedBtn = document.getElementById('startExamBtn');
+    const examConfigId = state.allocatedExamId;
+    if (!examConfigId) {
+        alert("Error: No allocated exam ID found. Please log in again.");
+        return;
+    }
+
     try {
         proceedBtn.disabled = true;
-        proceedBtn.innerText = "Securing Session...";
+        proceedBtn.innerText = "Verifying Attempt...";
 
-        // 1. First, get the ID from the server
         const sessionRes = await fetch(`${BASE_URL}/api/exams/start-exam`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: state.userId })
+            body: JSON.stringify({ userId: state.userId, examId: examConfigId })
         });
         
-        const sessionData = await sessionRes.json();
-        
-        if (!sessionRes.ok || !sessionData.examId) {
-            throw new Error(sessionData.error || "Could not initialize exam session.");
+        if (sessionRes.status === 403) {
+            alert("This exam has already been submitted. You cannot retake it.");
+            proceedBtn.disabled = false;
+            proceedBtn.innerText = "Start Examination";
+            return;
         }
 
-        // 2. Set the ID into the state immediately
+        const sessionData = await sessionRes.json();
+        if (!sessionRes.ok) throw new Error(sessionData.error);
+
         state.examId = sessionData.examId;
-        console.log("Session Secured:", state.examId);
+        proceedBtn.innerText = "Loading Questions...";
 
-        // 3. Fetch the questions
-        proceedBtn.innerText = "Downloading Questions...";
         const qRes = await fetch(`${BASE_URL}/api/exams/fetch-questions/${state.examId}`);
-        
-        if (!qRes.ok) throw new Error("Question download failed.");
-
         const qData = await qRes.json(); 
 
-        // --- FIXES START HERE ---
-        state.allQuestions = qData; // Use qData, not data
-        state.currentSubIndex = 0;
-        state.currentQIndex = 0;
-        
-        // Default to 120 minutes (7200 seconds) if not provided by server
+        state.allQuestions = qData;
         state.timeLeft = 120 * 60; 
 
-        // Switch the view to the exam page
         switchPage('instructionsPage', 'examPage');
-
-        // Render UI Components
-        renderTabs();       
-        renderQuestion();   
-        renderGrid();       
-        startTimer();
-        // --- FIXES END HERE ---
+        renderTabs(); renderQuestion(); renderGrid(); startTimer();
 
     } catch (e) {
-        console.error(e);
-        alert("Initialization Error: " + e.message);
+        alert("Error: " + e.message);
         proceedBtn.disabled = false;
         proceedBtn.innerText = "Start Examination";
     }
@@ -316,20 +325,14 @@ function preparePayload(status = "active") {
   
     
     function renderQuestion() {
-    // 1. Safety check: Ensure questions are loaded
     if (!state.allQuestions || state.allQuestions.length === 0) return;
     
     const subjectData = state.allQuestions[state.currentSubIndex];
-    if (!subjectData || !subjectData.questions) return;
-    
     const q = subjectData.questions[state.currentQIndex];
     if (!q) return;
 
     const area = document.getElementById('questionArea');
 
-    // 2. Build the Header (Subject and Question Number)
-  //  const subLabel = q.subsubtopic && !q.passageText ? ` — ${q.subsubtopic}` : "";
-    
     let html = `
         <div class="q-meta" style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:bold; color:var(--primary);">
             <span>${subjectData.subject}</span>
@@ -337,40 +340,51 @@ function preparePayload(status = "active") {
         </div>
     `;
 
-    // 3. Handle Passages (Fixed size box within the scrollable area)
-    if (q.passageText || q.passage) {
-        html += `<div class="passage-box" style="background:#fffbe6; padding:15px; border-radius:8px; margin-bottom:20px; border-left:4px solid #facc15; max-height:150px; overflow-y:auto; font-style:italic;">
-                    <strong>Passage:</strong><br>${q.passageText || q.passage}
+    // 3. Handle Passages - Checking 'passage' as seen in your screenshot
+    const passageContent = q.passage || q.passageText;
+    if (passageContent && passageContent.trim() !== "") {
+        html += `<div class="passage-box" style="background:#fffbe6; padding:15px; border-radius:8px; margin-bottom:20px; border-left:4px solid #facc15; max-height:200px; overflow-y:auto; font-style:italic;">
+                    <strong style="color:#854d0e;">Reading Passage:</strong><br>${passageContent}
                  </div>`;
     }
 
-    // 4. Question Text
-    html += `<div class="question-text" style="font-size:1.1rem; margin-bottom:20px; line-height:1.5;">${q.questionText}</div>`;
+    // 4. Image Support
+    if (q.questionImage) {
+        html += `<div style="text-align:center; margin-bottom:15px;">
+                    <img src="${q.questionImage}" style="max-width:100%; border-radius:8px; border:1px solid #ddd;">
+                 </div>`;
+    }
 
-    // 5. Options Area (Fancy Row Selection)
-    html += `<div class="options-container">`;
+    // 5. Question Text
+    const textToShow = q.questionText || q.question || "No question text provided";
+    html += `<div class="question-text" style="font-size:1.15rem; margin-bottom:25px; line-height:1.6; color:#1e293b;">${textToShow}</div>`;
+
+    // 6. Options Area
+    html += `<div class="options-container" style="display:grid; gap:12px;">`;
     const letters = ['A', 'B', 'C', 'D', 'E'];
     
     q.options.forEach((opt, index) => {
-        // Check if this option is the one the student already selected
         const isSelected = state.answers[q._id] === opt.key;
         
         html += `
-            <div class="option ${isSelected ? 'selected' : ''}" onclick="saveAnswer('${q._id}', '${opt.key}')">
-                <div class="opt-key">${letters[index]}</div>
-                <div class="opt-text">${opt.value}</div>
+            <div class="option ${isSelected ? 'selected' : ''}" 
+                 onclick="saveAnswer('${q._id}', '${opt.key}')"
+                 style="display:flex; align-items:center; padding:12px; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; transition:0.2s;">
+                <div class="opt-key" style="width:30px; height:30px; background:${isSelected ? 'var(--primary)' : '#f1f5f9'}; color:${isSelected ? 'white' : '#475569'}; display:flex; align-items:center; justify-content:center; border-radius:50%; font-weight:bold; margin-right:15px;">
+                    ${letters[index]}
+                </div>
+                <div class="opt-text" style="flex:1;">
+                    ${opt.value}
+                    ${opt.optionImage ? `<img src="${opt.optionImage}" style="display:block; max-height:120px; margin-top:8px; border-radius:4px;">` : ''}
+                </div>
             </div>
         `;
     });
     html += `</div>`;
 
-    // Update the DOM
     area.innerHTML = html;
-    
-    // Reset scroll position to top whenever a new question is loaded
     area.scrollTop = 0;
 
-    // 6. Refresh Grid and MathJax
     if (typeof renderGrid === "function") renderGrid();
     if (window.MathJax) MathJax.typesetPromise();
 }
@@ -397,7 +411,6 @@ function renderGrid() {
 function saveAnswer(qId, key) {
     state.answers[qId] = key;
     renderQuestion(); 
-
     // Reset the 2-second timer every time a user clicks
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(autoSaveToServer, 2000);
@@ -593,26 +606,12 @@ function startTimer() {
 
 // A reusable function for the end of the exam
 async function handleFinalSubmission(finalStatus) {
+    // 1. Prepare data
     const payload = preparePayload(finalStatus);
-    try {
-        await fetch(`${BASE_URL}/api/exams/submit-exam`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-        alert(finalStatus === "timed-out" ? "Time is up! Exam saved." : "Exam Submitted!");
-        window.location.href = "results.html";
-    } catch (err) {
-        console.error("Final submission failed:", err);
-    }
-}
-
     
-
-    async function confirmSubmit() {
-    if (!confirm("Are you sure you want to end the exam?")) return;
-
-    const payload = preparePayload("submitted");
+    // UI Feedback: Disable buttons if they exist
+    const submitBtn = document.querySelector("button[onclick='confirmSubmit()']");
+    if (submitBtn) submitBtn.disabled = true;
 
     try {
         const res = await fetch(`${BASE_URL}/api/exams/submit-exam`, {
@@ -621,30 +620,62 @@ async function handleFinalSubmission(finalStatus) {
             body: JSON.stringify(payload)
         });
 
-        if (res.ok) {
-            alert("Exam Submitted Successfully!");
-            window.location.href = "results.html"; // Redirect to results
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+            // 2. Alert based on status
+            alert(finalStatus === "timed-out" ? "Time is up! Your exam has been saved." : "Exam Submitted Successfully!");
+            
+            // 3. Stop the timer if it was a manual submission
+            if (state.timerInterval) clearInterval(state.timerInterval);
+
+            // 4. Render the Raw Scores using result.data
+            // This is the data we calculated in Step 3 on the backend
+            showResults(result.data);
+
+            // Ensure the user is at the top to see the results
+            window.scrollTo(0, 0);
+        } else {
+            throw new Error(result.error || "Submission failed");
         }
     } catch (err) {
-        alert("Submission Error: " + err.message);
+        console.error("Final submission failed:", err);
+        alert("Error: " + err.message);
+        if (submitBtn) submitBtn.disabled = false;
     }
 }
 
     
 
-    function showResults(data) {
-        document.getElementById('examPage').classList.add('hidden');
-        document.getElementById('resultPage').classList.remove('hidden');
-        document.getElementById('scoreCircle').innerText = `${data.aggregateScore} / 400`;
+    function confirmSubmit() {
+    // 1. Ask for confirmation
+    if (confirm("Are you sure you want to end the exam? This action cannot be undone.")) {
         
-        const body = document.getElementById('resultBody');
-        body.innerHTML = data.subjectResults.map(r => `
-            <tr>
-                <td>${r.subjectName}</td>
-                <td>${r.weightedScore} / 100 <br><small>(${r.correctCount} correct)</small></td>
-            </tr>
-        `).join('');
+        // 2. Call the centralized submission function
+        handleFinalSubmission("submitted");
     }
+}
+
+    
+function showResults(data) {
+    // Hide exam, show result page
+    document.getElementById('examPage').classList.add('hidden');
+    document.getElementById('resultPage').classList.remove('hidden');
+    
+    // Header text
+    document.getElementById('resultHeader').innerText = "Exam Completed Successfully";
+    
+    const body = document.getElementById('resultBody');
+    body.innerHTML = data.subjectResults.map(r => `
+        <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 15px; font-weight: bold;">${r.subjectName}</td>
+            <td style="padding: 15px; text-align: right; color: var(--secondary);">
+                ${r.correctCount} / ${r.totalQuestions}
+            </td>
+        </tr>
+    `).join('');
+}
+    
 </script>
 </body>
 </html>
